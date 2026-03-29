@@ -1,0 +1,829 @@
+\documentclass[12pt, a4paper]{article}
+
+% ── Codificación y lengua ──────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+
+% ── Tipografía y espaciado ─────────────────────────────────────────────────
+\usepackage{lmodern}
+\usepackage[protrusion=true,expansion=false]{microtype}
+\usepackage{parskip}
+\setlength{\parskip}{8pt}
+
+% ── Márgenes ──────────────────────────────────────────────────────────────
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.8cm]{geometry}
+
+% ── Color ─────────────────────────────────────────────────────────────────
+\usepackage[dvipsnames, table]{xcolor}
+
+% Paleta corporativa
+\definecolor{primario}{HTML}{1D9E75}     % teal principal
+\definecolor{primarioClaro}{HTML}{E1F5EE}
+\definecolor{secundario}{HTML}{534AB7}   % púrpura
+\definecolor{secundarioClaro}{HTML}{EEEDFE}
+\definecolor{acento}{HTML}{D85A30}       % coral
+\definecolor{acentoClaro}{HTML}{FAECE7}
+\definecolor{ambar}{HTML}{BA7517}
+\definecolor{ambarClaro}{HTML}{FAEEDA}
+\definecolor{gris}{HTML}{5F5E5A}
+\definecolor{grisClaro}{HTML}{F1EFE8}
+\definecolor{grisMedio}{HTML}{D3D1C7}
+
+% ── Cabeceras y pies de página ─────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\textcolor{gris}{App CAA para TEA --- Blueprint Técnico}}
+\fancyhead[R]{\small\textcolor{gris}{\thepage}}
+\fancyfoot[C]{\small\textcolor{grisMedio}{Documento confidencial · 2025}}
+
+% ── Secciones ─────────────────────────────────────────────────────────────
+\usepackage{titlesec}
+\titleformat{\section}
+  {\large\bfseries\color{primario}}
+  {\thesection.}{0.8em}{}[\vspace{-2pt}\textcolor{grisMedio}{\rule{\linewidth}{0.6pt}}]
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{secundario}}
+  {\thesubsection.}{0.7em}{}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{gris}}
+  {\thesubsubsection.}{0.6em}{}
+
+% ── Cajas de contenido ────────────────────────────────────────────────────
+\usepackage[most]{tcolorbox}
+
+% Caja de "punto clave"
+\newtcolorbox{puntoclave}[1][]{
+  colback=primarioClaro, colframe=primario,
+  boxrule=0.5pt, arc=6pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt,
+  fonttitle=\small\bfseries\color{primario},
+  title={#1}
+}
+
+% Caja técnica (código / esquema)
+\newtcolorbox{cajatecnica}[1][]{
+  colback=grisClaro, colframe=grisMedio,
+  boxrule=0.4pt, arc=4pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt,
+  fonttitle=\small\bfseries\color{gris},
+  title={#1}
+}
+
+% Caja de módulo de la app
+\newtcolorbox{cajamodulo}[2][]{
+  colback=#1, colframe=#1!70!black,
+  boxrule=0.5pt, arc=8pt,
+  left=12pt, right=12pt, top=10pt, bottom=10pt,
+  title={\textbf{#2}},
+  fonttitle=\normalsize\bfseries,
+  #1
+}
+
+% Caja de alerta / nota
+\newtcolorbox{nota}[1][Nota]{
+  colback=ambarClaro, colframe=ambar,
+  boxrule=0.5pt, arc=5pt,
+  left=10pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\small\bfseries\color{ambar},
+  title={#1}
+}
+
+% ── Listas ────────────────────────────────────────────────────────────────
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=1.4em, itemsep=3pt, topsep=4pt}
+\setlist[enumerate]{leftmargin=1.4em, itemsep=3pt, topsep=4pt}
+
+% ── Tablas ────────────────────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% ── Hyperlinks ────────────────────────────────────────────────────────────
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=secundario,
+  urlcolor=primario,
+  citecolor=gris,
+  pdftitle={App CAA para TEA - Blueprint Técnico},
+  pdfauthor={Equipo de Desarrollo},
+  pdfsubject={Comunicación Aumentativa y Alternativa}
+}
+
+% ── TikZ para diagramas ───────────────────────────────────────────────────
+\usepackage{tikz}
+\usetikzlibrary{shapes.rounded, arrows.meta, positioning, fit, backgrounds}
+
+% ── Código fuente ─────────────────────────────────────────────────────────
+\usepackage{listings}
+\lstset{
+  basicstyle=\small\ttfamily\color{gris},
+  backgroundcolor=\color{grisClaro},
+  frame=single, framerule=0.4pt, rulecolor=\color{grisMedio},
+  breaklines=true, breakatwhitespace=true,
+  xleftmargin=10pt, xrightmargin=10pt,
+  numbers=left, numberstyle=\tiny\color{grisMedio},
+  numbersep=8pt,
+  keywordstyle=\bfseries\color{secundario},
+  commentstyle=\itshape\color{gris!70},
+  stringstyle=\color{primario},
+  tabsize=2, showstringspaces=false
+}
+
+% ── Graficados inline sencillos ───────────────────────────────────────────
+\usepackage{graphicx}
+
+% ─────────────────────────────────────────────────────────────────────────
+\begin{document}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  PORTADA
+% ══════════════════════════════════════════════════════════════════════════
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+  % Banda superior
+  \fill[primario] (current page.north west) rectangle
+    ([yshift=-3.5cm]current page.north east);
+  % Banda inferior delgada
+  \fill[primarioClaro] (current page.south west) rectangle
+    ([yshift=1.2cm]current page.south east);
+  % Acento lateral
+  \fill[acento] ([xshift=0cm]current page.north west) rectangle
+    ([xshift=0.8cm, yshift=-3.5cm]current page.north west);
+\end{tikzpicture}
+
+\vspace*{1.8cm}
+{\color{white}\fontsize{11}{14}\selectfont\textbf{BLUEPRINT TÉCNICO Y DE DISEÑO}}
+
+\vspace{0.4cm}
+{\color{white}\fontsize{24}{30}\selectfont\textbf{Aplicación CAA para TEA}}
+
+\vspace{0.3cm}
+{\color{white!80!primario}\fontsize{14}{18}\selectfont
+Comunicación Aumentativa y Alternativa\\
+para niños con Trastorno del Espectro Autista\\
+Nivel 2--3, rango de edad 3--6 años}
+
+\vspace{2.5cm}
+
+\begin{tcolorbox}[colback=white, colframe=grisMedio, arc=8pt,
+  boxrule=0.5pt, left=16pt, right=16pt, top=12pt, bottom=12pt,
+  width=\textwidth]
+\begin{tabular}{L{4cm} L{9cm}}
+\textcolor{gris}{\small\textbf{Tipo de documento}} &
+  \small Blueprint técnico, de datos y de diseño \\[4pt]
+\textcolor{gris}{\small\textbf{Audiencia}} &
+  \small Evaluadores académicos · Inversores · Equipo técnico · Profesionales sanitarios/educativos \\[4pt]
+\textcolor{gris}{\small\textbf{Versión}} &
+  \small 1.0 --- Documento inicial \\[4pt]
+\textcolor{gris}{\small\textbf{Fecha}} &
+  \small 2025 \\[4pt]
+\textcolor{gris}{\small\textbf{Estado}} &
+  \small \textcolor{acento}{\textbf{Pre-desarrollo}} --- Fase de diseño y planificación \\
+\end{tabular}
+\end{tcolorbox}
+
+\vfill
+
+{\small\textcolor{gris}{Documento preparado para presentación y revisión. No contiene código funcional final.\\
+Todos los esquemas, algoritmos y decisiones técnicas son previos a la implementación.}}
+
+\end{titlepage}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  ÍNDICE
+% ══════════════════════════════════════════════════════════════════════════
+\newpage
+\tableofcontents
+\newpage
+
+% ══════════════════════════════════════════════════════════════════════════
+%  1. RESUMEN EJECUTIVO
+% ══════════════════════════════════════════════════════════════════════════
+\section{Resumen ejecutivo}
+
+Este documento describe el diseño completo de una aplicación de \textbf{Comunicación Aumentativa y Alternativa (CAA)} orientada a niños de entre 3 y 6 años con diagnóstico de \textbf{Trastorno del Espectro Autista (TEA) en niveles 2 y 3}.
+
+La aplicación no busca sustituir el lenguaje oral, sino ofrecer un andamiaje estructurado para que el niño pueda:
+
+\begin{itemize}
+  \item \textbf{Construir frases} combinando pictogramas de forma secuencial.
+  \item \textbf{Anticipar rutinas} mediante representaciones visuales claras del tiempo.
+  \item \textbf{Regular sus emociones} identificando estados internos y estrategias de calma.
+\end{itemize}
+
+Paralelamente, la plataforma proporciona a padres y docentes un \textbf{panel de seguimiento} con indicadores objetivos del progreso comunicativo del niño.
+
+\begin{puntoclave}[Propuesta de valor]
+La aplicación combina intervención terapéutica basada en evidencia (CAA, pictogramas ARASAAC) con tecnología moderna (PWA, TTS nativo, API REST), generando datos clínicamente relevantes sin añadir carga a las familias.
+\end{puntoclave}
+
+\subsection{Población objetivo}
+
+\begin{tabular}{L{4cm} L{10cm}}
+\toprule
+\textbf{Criterio} & \textbf{Descripción} \\
+\midrule
+Edad & 3 a 6 años \\
+Diagnóstico & TEA nivel 2--3 (DSM-5 / CIE-11) \\
+Perfil lingüístico & Verbales o con comunicación funcional emergente \\
+Contexto de uso & Domicilio familiar, aula ordinaria o de apoyo, centros de atención temprana \\
+Dispositivo esperado & Tablet (iOS o Android), resolución mínima 768×1024 px \\
+\bottomrule
+\end{tabular}
+
+\subsection{Objetivos terapéuticos}
+
+\begin{enumerate}
+  \item Aumentar la \textbf{longitud media de frase} (LMF) en comunicación espontánea.
+  \item Ampliar el \textbf{vocabulario funcional} (diversidad léxica de pictogramas usados).
+  \item Fomentar el uso \textbf{autónomo} del regulador emocional sin mediación adulta.
+  \item Reducir la ansiedad ante cambios de rutina mediante la \textbf{anticipación visual}.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  2. CONTEXTO Y JUSTIFICACIÓN
+% ══════════════════════════════════════════════════════════════════════════
+\section{Contexto y justificación}
+
+\subsection{¿Qué es la Comunicación Aumentativa y Alternativa?}
+
+La CAA engloba todos los métodos, herramientas y estrategias que complementan o reemplazan el habla cuando esta es insuficiente para satisfacer las necesidades comunicativas de una persona. Los sistemas de pictogramas --- representaciones gráficas simples asociadas a palabras --- constituyen la herramienta más extendida en intervención con TEA.
+
+El portal \textbf{ARASAAC} (Centro Aragonés para la Comunicación Aumentativa y Alternativa), dependiente del Gobierno de Aragón, ofrece más de 40\,000 pictogramas bajo licencia Creative Commons, con API pública gratuita. Es el estándar de facto en contextos hispanohablantes.
+
+\subsection{Evidencia sobre eficacia}
+
+Numerosos estudios respaldan el uso de sistemas de CAA basados en pictogramas en niños con TEA:
+
+\begin{itemize}
+  \item Mejoran la iniciación comunicativa y reducen conductas disruptivas asociadas a la frustración por no poder expresarse.
+  \item La anticipación visual de rutinas reduce significativamente la ansiedad ante transiciones.
+  \item Los sistemas de regulación emocional basados en pictogramas favorecen la identificación y el etiquetado de emociones propias.
+\end{itemize}
+
+\begin{nota}[Sobre el nivel de TEA]
+Los niveles 2 y 3 implican necesidades de apoyo sustancial. Estos niños pueden tener lenguaje oral, pero con dificultades marcadas en la comunicación social espontánea, rigidez ante cambios y alta variabilidad en sus estrategias de autorregulación. La app se diseña específicamente para este perfil, no para TEA nivel 1 ni para usuarios sin lenguaje funcional alguno.
+\end{nota}
+
+\subsection{Brecha de mercado}
+
+Las soluciones existentes presentan limitaciones relevantes:
+
+\begin{tabular}{L{4cm} L{5cm} L{5cm}}
+\toprule
+\textbf{Herramienta} & \textbf{Fortaleza} & \textbf{Limitación} \\
+\midrule
+Proloquo2Go & Potente y completa & Coste elevado, complejidad de configuración \\
+LetMeTalk & Gratuita y open source & Sin panel de seguimiento, UX poco adaptada \\
+Pictogramas ARASAAC & Recurso libre de calidad & No es una app, solo banco de imágenes \\
+Tableros físicos & Bajo coste, sin pantalla & Sin registro, sin adaptación dinámica \\
+\bottomrule
+\end{tabular}
+
+\vspace{6pt}
+Nuestra propuesta ocupa el espacio de una herramienta \textbf{gratuita o de bajo coste, en español, con seguimiento clínico integrado} y diseño específico para el perfil TEA nivel 2--3.
+
+% ══════════════════════════════════════════════════════════════════════════
+%  3. ARQUITECTURA TÉCNICA
+% ══════════════════════════════════════════════════════════════════════════
+\section{Arquitectura técnica}
+
+\subsection{Stack tecnológico}
+
+\begin{tabular}{L{3.5cm} L{4cm} L{6.5cm}}
+\toprule
+\textbf{Capa} & \textbf{Tecnología} & \textbf{Justificación} \\
+\midrule
+Frontend & React + Vite (PWA) & Instalable en tablet sin app store, offline-first \\
+Backend & Node.js + Express & Ecosistema amplio, bajo coste de hosting \\
+Base de datos & PostgreSQL & Integridad relacional, agregaciones SQL para KPIs \\
+Pictogramas & API ARASAAC & 40\,000+ pictogramas, licencia CC, gratuita \\
+Síntesis de voz & Web Speech API & Nativa en navegador, sin coste ni latencia de red \\
+Hosting & Railway / Render & Tier gratuito viable para MVP \\
+\bottomrule
+\end{tabular}
+
+\subsection{Diagrama de arquitectura}
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=0.8cm and 1.2cm,
+  box/.style={rounded corners=6pt, minimum width=3cm, minimum height=1cm,
+              text centered, font=\small\bfseries, draw, thick},
+  arrow/.style={-{Stealth[scale=1.1]}, thick, color=gris},
+  label/.style={font=\footnotesize\itshape, color=gris}
+]
+
+% Dispositivo usuario
+\node[box, fill=primarioClaro, draw=primario, color=primario] (tablet)
+  {Tablet / Navegador\\{\footnotesize React PWA}};
+
+% Backend
+\node[box, fill=secundarioClaro, draw=secundario, color=secundario,
+      right=2.2cm of tablet] (api)
+  {API REST\\{\footnotesize Node.js + Express}};
+
+% Base de datos
+\node[box, fill=ambarClaro, draw=ambar, color=ambar,
+      right=2.2cm of api] (db)
+  {PostgreSQL\\{\footnotesize Base de datos}};
+
+% ARASAAC
+\node[box, fill=acentoClaro, draw=acento, color=acento,
+      above=1.2cm of api] (arasaac)
+  {API ARASAAC\\{\footnotesize Pictogramas CC}};
+
+% TTS
+\node[box, fill=grisClaro, draw=grisMedio, color=gris,
+      below=1.2cm of tablet] (tts)
+  {Web Speech API\\{\footnotesize TTS nativo}};
+
+% Flechas
+\draw[arrow] (tablet) -- node[above, label]{HTTP/JSON} (api);
+\draw[arrow] (api) -- node[above, label]{SQL} (db);
+\draw[arrow] (api) -- node[right, label]{GET pictogramas} (arasaac);
+\draw[arrow, dashed] (arasaac) -- node[left, label]{URL imágenes} (tablet);
+\draw[arrow, <->] (tablet) -- node[right, label]{síntesis voz} (tts);
+
+\end{tikzpicture}
+\end{center}
+
+\subsection{Justificación de PostgreSQL vs MongoDB}
+
+Se eligió \textbf{PostgreSQL} (base de datos relacional) por las siguientes razones:
+
+\begin{itemize}
+  \item Las relaciones entre entidades son fuertemente estructuradas: un usuario genera frases, cada frase contiene pictogramas en un orden específico.
+  \item Los KPIs del panel adulto requieren \textbf{agregaciones y JOINs eficientes} (promedio semanal, conteo de valores distintos, agrupación por fecha).
+  \item El historial clínico y educativo exige \textbf{integridad referencial real}: no puede existir una frase sin un usuario válido.
+  \item El campo \texttt{pictogram\_ids} en la tabla de frases usa el tipo nativo \texttt{jsonb} de PostgreSQL, que permite almacenar el orden sin sacrificar la eficiencia en consulta.
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  4. ESTRUCTURA DE DATOS
+% ══════════════════════════════════════════════════════════════════════════
+\section{Estructura de datos (esquema de base de datos)}
+
+\subsection{Entidades y relaciones}
+
+El esquema consta de \textbf{seis tablas principales}. Las relaciones clave son:
+
+\begin{itemize}
+  \item \texttt{USERS} $\rightarrow$ \texttt{GENERATED\_PHRASES} (un usuario genera muchas frases)
+  \item \texttt{USERS} $\rightarrow$ \texttt{EMOTIONAL\_LOGS} (un usuario registra muchas emociones)
+  \item \texttt{USERS} $\rightarrow$ \texttt{USAGE\_EVENTS} (telemetría completa por usuario)
+  \item \texttt{CATEGORIES} $\rightarrow$ \texttt{PICTOGRAMS} (una categoría agrupa muchos pictogramas)
+\end{itemize}
+
+\subsection{Definición de tablas}
+
+\subsubsection{USERS --- Gestión de usuarios y roles}
+
+\begin{cajatecnica}[Tabla: users]
+\begin{lstlisting}[language=SQL]
+CREATE TABLE users (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name          VARCHAR(100) NOT NULL,
+  role          VARCHAR(20) NOT NULL
+                  CHECK (role IN ('child','parent','teacher')),
+  linked_adult_id UUID REFERENCES users(id),
+  avatar_color  VARCHAR(7),        -- hex color para avatar
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+\end{lstlisting}
+\end{cajatecnica}
+
+El campo \texttt{role} define el tipo de usuario. Un niño puede tener un adulto vinculado principal (\texttt{linked\_adult\_id}); para relaciones muchos-a-muchos se añadiría una tabla intermedia \texttt{user\_links}.
+
+\subsubsection{CATEGORIES y PICTOGRAMS --- Biblioteca de pictogramas}
+
+\begin{cajatecnica}[Tablas: categories y pictograms]
+\begin{lstlisting}[language=SQL]
+CREATE TABLE categories (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name          VARCHAR(60) NOT NULL,  -- 'Rutinas', 'Emociones'...
+  color_code    VARCHAR(7),            -- color de la categoria en UI
+  display_order INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE pictograms (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  arasaac_id    INT NOT NULL UNIQUE,   -- ID en la API de ARASAAC
+  word          VARCHAR(80) NOT NULL,  -- palabra escrita asociada
+  image_url     TEXT NOT NULL,         -- URL cacheada de ARASAAC
+  category_id   UUID NOT NULL REFERENCES categories(id)
+);
+\end{lstlisting}
+\end{cajatecnica}
+
+\subsubsection{GENERATED\_PHRASES --- Historial de frases}
+
+\begin{cajatecnica}[Tabla: generated\_phrases]
+\begin{lstlisting}[language=SQL]
+CREATE TABLE generated_phrases (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES users(id),
+  pictogram_ids   JSONB NOT NULL,
+  -- Formato: [{"id": "uuid-picto", "position": 1}, ...]
+  phrase_length   INT NOT NULL,        -- numero de pictogramas
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_phrases_user_date
+  ON generated_phrases(user_id, created_at DESC);
+\end{lstlisting}
+\end{cajatecnica}
+
+\subsubsection{EMOTIONAL\_LOGS --- Registro emocional}
+
+\begin{cajatecnica}[Tabla: emotional\_logs]
+\begin{lstlisting}[language=SQL]
+CREATE TABLE emotional_logs (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID NOT NULL REFERENCES users(id),
+  emotion           VARCHAR(40) NOT NULL,
+  intensity         SMALLINT CHECK (intensity BETWEEN 1 AND 3),
+  strategy_chosen   VARCHAR(80),  -- NULL si no eligio estrategia
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+\end{lstlisting}
+\end{cajatecnica}
+
+\subsubsection{USAGE\_EVENTS --- Telemetría y KPIs}
+
+\begin{cajatecnica}[Tabla: usage\_events]
+\begin{lstlisting}[language=SQL]
+CREATE TABLE usage_events (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES users(id),
+  event_type  VARCHAR(60) NOT NULL,
+  -- Ejemplos: 'phrase_built', 'emotion_logged',
+  --           'anticipation_viewed', 'session_start'
+  details     JSONB,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_events_user_type
+  ON usage_events(user_id, event_type, created_at DESC);
+\end{lstlisting}
+\end{cajatecnica}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  5. SISTEMA DE SEGUIMIENTO Y KPIs
+% ══════════════════════════════════════════════════════════════════════════
+\section{Sistema de seguimiento: indicadores de progreso (KPIs)}
+
+El panel adulto calcula cuatro indicadores a partir de los datos almacenados. A continuación se describe su lógica en pseudocódigo y la consulta SQL equivalente.
+
+\subsection{KPI 1 --- Longitud media de frase (LMF)}
+
+\begin{puntoclave}[¿Qué mide?]
+El promedio de pictogramas por frase en una semana dada. Un aumento sostenido indica mayor complejidad comunicativa.
+\end{puntoclave}
+
+\begin{cajatecnica}[Pseudocódigo --- LMF semanal]
+\begin{lstlisting}
+FUNCTION calcLMF(userId, weekStart):
+  phrases = DB.query(
+    "SELECT phrase_length
+     FROM generated_phrases
+     WHERE user_id = $1
+       AND created_at >= $2
+       AND created_at <  $2 + INTERVAL '7 days'",
+    userId, weekStart
+  )
+  IF phrases.length == 0: RETURN null
+  RETURN ROUND(SUM(phrase.phrase_length) / phrases.length, 2)
+
+-- Para la grafica historica (ultimas 8 semanas):
+FUNCTION lmfSeries(userId, weeks = 8):
+  RETURN [
+    { week: w, lmf: calcLMF(userId, w) }
+    FOR w IN last_n_week_starts(weeks)
+  ]
+\end{lstlisting}
+\end{cajatecnica}
+
+\subsection{KPI 2 --- Diversidad léxica}
+
+\begin{puntoclave}[¿Qué mide?]
+El número de pictogramas \emph{distintos} utilizados en los últimos 30 días. Refleja la amplitud del vocabulario funcional activo.
+\end{puntoclave}
+
+\begin{cajatecnica}[Consulta SQL --- Diversidad léxica]
+\begin{lstlisting}[language=SQL]
+SELECT COUNT(DISTINCT elem->>'id') AS unique_pictograms
+FROM generated_phrases,
+     jsonb_array_elements(pictogram_ids) AS elem
+WHERE user_id    = $1
+  AND created_at >= NOW() - INTERVAL '30 days';
+\end{lstlisting}
+\end{cajatecnica}
+
+\subsection{KPI 3 --- Frecuencia de uso}
+
+\begin{puntoclave}[¿Qué mide?]
+El número de días activos por semana. Un uso frecuente (3--5 días/semana) es indicador de integración real de la herramienta en la vida diaria.
+\end{puntoclave}
+
+\begin{cajatecnica}[Consulta SQL --- Días activos por semana]
+\begin{lstlisting}[language=SQL]
+SELECT
+  DATE_TRUNC('week', created_at)     AS week,
+  COUNT(DISTINCT DATE(created_at))   AS active_days
+FROM usage_events
+WHERE user_id    = $1
+  AND created_at >= NOW() - INTERVAL '8 weeks'
+GROUP BY week
+ORDER BY week;
+\end{lstlisting}
+\end{cajatecnica}
+
+\subsection{KPI 4 --- Uso autónomo del regulador emocional}
+
+\begin{puntoclave}[¿Qué mide?]
+El porcentaje de registros emocionales en los que el niño seleccionó una estrategia de regulación (sin que el adulto la eligiese por él). Es el indicador más relevante de autorregulación.
+\end{puntoclave}
+
+\begin{cajatecnica}[Consulta SQL --- Tasa de autonomía emocional]
+\begin{lstlisting}[language=SQL]
+SELECT
+  COUNT(*)                                  AS total_logs,
+  COUNT(*) FILTER (WHERE strategy_chosen
+                         IS NOT NULL)       AS autonomous_logs,
+  ROUND(
+    100.0 * COUNT(*) FILTER (
+      WHERE strategy_chosen IS NOT NULL)
+    / NULLIF(COUNT(*), 0), 1
+  )                                         AS autonomy_rate
+FROM emotional_logs
+WHERE user_id    = $1
+  AND created_at >= NOW() - INTERVAL '30 days';
+\end{lstlisting}
+\end{cajatecnica}
+
+\subsection{Endpoint del dashboard}
+
+Un único endpoint agrega los cuatro KPIs y los devuelve en una sola llamada, evitando múltiples peticiones desde el frontend:
+
+\begin{cajatecnica}[]
+\begin{lstlisting}
+GET /api/dashboard/:childId?weeks=8&days=30
+
+Respuesta JSON:
+{
+  "lmfSeries":         [{ week, lmf }, ...],
+  "diversity":         { count, periodDays },
+  "frequency":         [{ week, activeDays }, ...],
+  "emotionalAutonomy": { total, autonomous, rate }
+}
+\end{lstlisting}
+\end{cajatecnica}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  6. DISEÑO DE INTERFAZ
+% ══════════════════════════════════════════════════════════════════════════
+\section{Diseño de interfaz: principios y módulos}
+
+\subsection{Principios de diseño para TEA nivel 2--3}
+
+El diseño de la interfaz parte de la investigación en necesidades perceptivas y cognitivas de niños con TEA. Los principios no negociables son:
+
+\begin{tabular}{L{4cm} L{10cm}}
+\toprule
+\textbf{Principio} & \textbf{Aplicación concreta} \\
+\midrule
+Reducción de sobrecarga sensorial & Fondo neutro (blanco roto / gris muy claro), paleta pastel no saturada \\
+Máximo 6 ítems en pantalla & Nunca más de 6 pictogramas visibles simultáneamente \\
+Previsibilidad & Navegación lineal, sin menús ocultos ni gestos complejos \\
+Asociación constante & Cada pictograma lleva su palabra escrita debajo, siempre \\
+Pictogramas ARASAAC & Estándar reconocido, consistencia visual, licencia libre \\
+Tamaño homogéneo & Todos los pictogramas del mismo tamaño, mínimo 80×80 px \\
+Feedback inmediato & Cada interacción tiene respuesta visual y/o sonora clara \\
+\bottomrule
+\end{tabular}
+
+\subsection{Paleta de colores}
+
+\begin{tabular}{L{3cm} L{3cm} L{8cm}}
+\toprule
+\textbf{Módulo} & \textbf{Color} & \textbf{Uso} \\
+\midrule
+Frases & Verde-teal & Barra de frase, botón reproducir \\
+Emociones & Coral/rosa suave & Grid de emociones, estrategias \\
+Anticipación & Ámbar claro & Bloques de tiempo (Ahora / Después / Luego) \\
+Panel adulto & Púrpura suave & Cabeceras, gráficas de progreso \\
+Neutro & Gris muy claro & Fondo general, separadores \\
+\bottomrule
+\end{tabular}
+
+\subsection{Módulo A: Construcción de frases}
+
+\textbf{Descripción:} Permite al niño construir una frase combinando pictogramas de forma secuencial y reproducirla por voz.
+
+\textbf{Flujo de interacción:}
+
+\begin{enumerate}
+  \item La pantalla se abre con la \textbf{barra de frase vacía} en la parte superior y el \textbf{grid de categorías} (máx. 6) debajo.
+  \item El niño toca una \textbf{categoría} $\to$ el grid se actualiza mostrando los pictogramas de esa categoría (máx. 6).
+  \item El niño toca un \textbf{pictograma} $\to$ aparece en la barra de frase con animación suave.
+  \item Puede tocar un pictograma en la barra para \textbf{eliminarlo} (corrección sin pantallas nuevas).
+  \item Al tocar el \textbf{botón ``Reproducir''} (icono grande, verde), el sistema sintetiza la frase por voz y la guarda en el historial.
+  \item Un botón de \textbf{papelera} limpia la barra para empezar de nuevo.
+\end{enumerate}
+
+\textbf{Componentes React principales:}
+
+\begin{cajatecnica}[]
+\begin{lstlisting}
+<PhraseBuilder>
+  <PhraseBar />          {/* frases acumuladas, clicables para borrar */}
+  <CategoryStrip />      {/* selector de categoria, maximo 6 pills */}
+  <PictoGrid>
+    <PictoCard />        {/* pictograma + palabra, maximo 6 por grid */}
+  </PictoGrid>
+  <PlayButton />         {/* TTS: Web Speech API, lang="es-ES" */}
+  <ClearButton />
+</PhraseBuilder>
+\end{lstlisting}
+\end{cajatecnica}
+
+\textbf{Estado (useReducer):}
+\texttt{\{ phrase: Picto[], activeCategory: string|null, isPlaying: boolean \}}
+
+\subsection{Módulo B: Anticipación visual}
+
+\textbf{Descripción:} Muestra al niño qué va a pasar en los próximos pasos de su jornada, reduciendo la ansiedad ante transiciones.
+
+\textbf{Estructura visual:} Pantalla dividida en \textbf{tres bloques} de igual tamaño con fondos pastel diferenciados:
+
+\begin{tabular}{C{3cm} C{3cm} C{3cm}}
+\toprule
+\textbf{AHORA} & \textbf{DESPUÉS} & \textbf{LUEGO} \\
+\midrule
+Pictograma grande & Pictograma grande & Pictograma grande \\
+Fondo ámbar & Fondo teal claro & Fondo gris claro \\
+\bottomrule
+\end{tabular}
+
+\vspace{8pt}
+\textbf{Flujo de interacción:}
+
+\begin{enumerate}
+  \item El adulto configura los tres slots desde el panel adulto (con PIN de acceso).
+  \item El niño visualiza la secuencia. Al completar ``Ahora'', el adulto toca el bloque $\to$ aparece un \textbf{check grande} y los bloques avanzan.
+  \item Los datos se obtienen de \texttt{GET /api/schedule/:childId/today}.
+\end{enumerate}
+
+\subsection{Módulo C: Regulador emocional}
+
+\textbf{Descripción:} Ayuda al niño a identificar su emoción y acceder a estrategias de regulación adecuadas.
+
+\textbf{Flujo de tres pasos:}
+
+\begin{enumerate}
+  \item \textbf{Grid de emociones} (máx. 6): Feliz, Triste, Enfadado, Asustado, Sorprendido, Calmado. El niño toca la suya.
+  \item \textbf{Intensidad} (opcional, configurable): tres niveles visuales mediante tamaño de círculo creciente.
+  \item \textbf{Estrategias} (máx. 3 grandes): pictogramas de acciones calmantes según la emoción elegida (ej: Respirar, Zona tranquila, Música).
+\end{enumerate}
+
+Al seleccionar una estrategia, el sistema guarda \texttt{POST /api/emotional-log} con \texttt{\{emotion, intensity, strategy\_chosen\}} y muestra confirmación positiva. Si el niño sale sin elegir estrategia, el log se guarda con \texttt{strategy\_chosen = null} (uso no autónomo).
+
+\subsection{Módulo D: Panel de seguimiento (vista adulto)}
+
+\textbf{Descripción:} Interfaz exclusiva para padres y docentes, accesible con PIN, que muestra el progreso del niño de forma visual y comprensible.
+
+\textbf{Estructura:}
+
+\begin{enumerate}
+  \item \textbf{Selector de niño}: dropdown si el adulto tiene varios perfiles vinculados.
+  \item \textbf{4 KpiCards} en la parte superior: LMF actual, Diversidad léxica, Días activos, Tasa de autonomía emocional. Cada card incluye flecha de tendencia respecto a la semana anterior.
+  \item \textbf{Gráficas} (usando Recharts):
+    \begin{itemize}
+      \item \emph{Línea suave}: LMF por semana (eje X = semanas, eje Y = pictogramas).
+      \item \emph{Barras horizontales}: uso por categorías de pictogramas.
+      \item \emph{Donut}: distribución de emociones registradas.
+    \end{itemize}
+  \item \textbf{Selector de rango}: 7 días / 30 días / 90 días. Reactivo: todos los charts se re-cargan.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  7. ÁRBOL DE COMPONENTES REACT
+% ══════════════════════════════════════════════════════════════════════════
+\section{Árbol de componentes React}
+
+\begin{cajatecnica}[Estructura de componentes (simplificada)]
+\begin{lstlisting}
+App (Router + AuthContext)
+├── ChildLayout          (vista niño, fondo neutro, sin header complejo)
+│   ├── NavBar           (max 4 iconos grandes, siempre visible)
+│   ├── PhraseBuilder    (Modulo A)
+│   │   ├── PhraseBar
+│   │   ├── CategoryStrip
+│   │   ├── PictoGrid
+│   │   │   └── PictoCard (x6 max) -- pictograma + WordLabel
+│   │   ├── PlayButton    -- TTSEngine
+│   │   └── ClearButton
+│   ├── Anticipation     (Modulo B)
+│   │   └── TimeSlotBlock (x3: Ahora / Despues / Luego)
+│   └── EmotionRegulator (Modulo C)
+│       ├── EmotionGrid   -- PictoCard x6
+│       ├── IntensityPicker (opcional)
+│       └── StrategyPanel -- PictoCard x3 grande
+│
+└── AdultLayout          (vista adulto, requiere PIN)
+    ├── ChildSelector
+    ├── DateRangePicker
+    ├── KpiPanel
+    │   └── KpiCard (x4)
+    └── ChartsSection
+        ├── LmfLineChart
+        ├── CategoryBarChart
+        └── EmotionDonutChart
+
+-- Atoms compartidos entre layouts:
+PictoImage  |  WordLabel  |  TTSEngine  |  PinGate
+\end{lstlisting}
+\end{cajatecnica}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  8. HOJA DE RUTA
+% ══════════════════════════════════════════════════════════════════════════
+\section{Hoja de ruta de desarrollo}
+
+\begin{tabular}{C{1.2cm} L{3.5cm} L{9cm}}
+\toprule
+\textbf{Fase} & \textbf{Periodo} & \textbf{Entregables} \\
+\midrule
+0 & Semanas 1--2 & Configuración de entorno, migraciones SQL, proxy ARASAAC \\
+1 & Semanas 3--6 & Módulo A (PhraseBuilder) completo con TTS y registro \\
+2 & Semanas 7--9 & Módulo C (EmotionRegulator) con logs \\
+3 & Semanas 10--12 & Módulo B (Anticipation) con configuración adulto \\
+4 & Semanas 13--16 & Panel adulto (KPIs + gráficas) \\
+5 & Semanas 17--20 & Testing con familias piloto, ajustes UX, PWA offline \\
+6 & Semana 21+ & Lanzamiento beta, revisión con profesionales sanitarios \\
+\bottomrule
+\end{tabular}
+
+\begin{nota}[Criterio de priorización de módulos]
+El Módulo A (frases) se implementa primero por ser el de mayor complejidad de estado y el que genera el mayor volumen de datos para los KPIs. El panel adulto se deja para cuando existan datos reales que visualizar.
+\end{nota}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  9. CONSIDERACIONES ÉTICAS Y DE PRIVACIDAD
+% ══════════════════════════════════════════════════════════════════════════
+\section{Consideraciones éticas y de privacidad}
+
+Al tratarse de una aplicación que procesa datos de menores con discapacidad, se aplicarán las siguientes medidas desde el inicio del desarrollo:
+
+\begin{itemize}
+  \item \textbf{RGPD}: los datos de menores requieren consentimiento explícito del tutor legal. El backend no almacenará datos identificativos más allá del nombre y la fecha de creación del perfil.
+  \item \textbf{Minimización de datos}: únicamente se registran los eventos necesarios para calcular los KPIs clínicamente relevantes.
+  \item \textbf{Acceso por roles}: el PIN del adulto protege el panel de seguimiento. El niño no accede a datos de otros usuarios.
+  \item \textbf{Sin publicidad}: la aplicación no mostrará publicidad ni compartirá datos con terceros.
+  \item \textbf{Almacenamiento local primero}: los datos de sesión se guardarán localmente (IndexedDB) para uso offline, sincronizándose con el servidor cuando haya conexión.
+  \item \textbf{Revisión por profesionales}: el sistema de KPIs está diseñado para ser interpretado junto a un logopeda o psicólogo, no como diagnóstico autónomo.
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  10. GLOSARIO
+% ══════════════════════════════════════════════════════════════════════════
+\section{Glosario}
+
+\begin{tabular}{L{3.5cm} L{10.5cm}}
+\toprule
+\textbf{Término} & \textbf{Definición} \\
+\midrule
+CAA & Comunicación Aumentativa y Alternativa: conjunto de métodos y herramientas que complementan el habla. \\
+TEA & Trastorno del Espectro Autista: condición del neurodesarrollo con afectación en comunicación social y comportamientos restringidos. \\
+ARASAAC & Portal aragonés de CAA. Ofrece más de 40\,000 pictogramas bajo licencia Creative Commons. \\
+LMF & Longitud Media de Frase: número promedio de elementos (pictogramas) por enunciado. \\
+KPI & Key Performance Indicator: indicador clave de rendimiento o progreso. \\
+PWA & Progressive Web App: aplicación web instalable en dispositivos sin necesidad de tiendas de apps. \\
+TTS & Text-to-Speech: síntesis de voz a partir de texto. En esta app se usa la Web Speech API nativa. \\
+JSONB & Tipo de dato de PostgreSQL que almacena JSON de forma binaria optimizada para consultas. \\
+MVP & Minimum Viable Product: versión mínima funcional del producto para validación con usuarios reales. \\
+PIN & Número de identificación personal usado para separar el acceso del niño y del adulto. \\
+\bottomrule
+\end{tabular}
+
+% ══════════════════════════════════════════════════════════════════════════
+%  FINAL
+% ══════════════════════════════════════════════════════════════════════════
+\vfill
+\begin{center}
+\textcolor{grisMedio}{\rule{0.6\linewidth}{0.4pt}}\\[6pt]
+{\small\textcolor{gris}{Blueprint técnico preparado para fase de implementación.}}\\
+{\small\textcolor{gris}{Versión 1.0 · 2025 · Documento interno}}
+\end{center}
+
+\end{document}
