@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(jsx|js|json\\)$\")",
+      "Bash(npm install:*)",
+      "Bash(cd:*)",
+      "Bash(timeout 8 node index.js)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(cmd.exe //c \"taskkill /F /IM node.exe /T 2>nul\")",
+      "Bash(node index.js)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3001/api/health)",
+      "Bash(curl -s http://localhost:3001/api/users/all-children)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(node -e ' *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "claude-flow"
+  ]
+}
