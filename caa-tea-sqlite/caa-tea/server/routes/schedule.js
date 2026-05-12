@@ -7,9 +7,8 @@ import { STARS_SCHEDULE_ADVANCE } from '../utils/levels.js';
 
 const router = Router();
 
-// Helper: sql.js may store "null" as text — treat both NULL and "null" as null
 function parseSlot(raw) {
-  if (!raw || raw === 'null') return null;
+  if (raw === null || raw === undefined || raw === 'null' || raw === '') return null;
   try { return JSON.parse(raw); } catch { return null; }
 }
 
@@ -58,23 +57,18 @@ router.patch('/:childId/advance', requireAuth, (req, res) => {
   const nextSlot  = parseSlot(row.slot_next);
   const laterSlot = parseSlot(row.slot_later);
 
-  // If current slot is already completed (shouldn't happen but guard)
-  if (nowSlot?.completed) {
+  if (!nowSlot || nowSlot.completed) {
     return res.json({ slot_now: nowSlot, slot_next: nextSlot, slot_later: laterSlot, progress: null });
   }
 
-  // Mark current as completed
-  const completedLabel = nowSlot?.label || null;
+  const completedLabel = nowSlot.label || null;
 
-  // Rotate: next → now, later → next, null at the end
   let newNow, newNext, newLater;
   if (nextSlot) {
-    // There are more activities — rotate
     newNow   = { ...nextSlot, completed: false };
     newNext  = laterSlot ? { ...laterSlot, completed: false } : null;
     newLater = null;
   } else {
-    // This was the last activity — mark it completed, no rotation
     newNow   = { ...nowSlot, completed: true };
     newNext  = null;
     newLater = null;

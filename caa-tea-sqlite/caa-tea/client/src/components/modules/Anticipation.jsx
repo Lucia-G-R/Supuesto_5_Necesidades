@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../utils/api.js';
 
 const SLOT_CONFIG = {
-  now:   { label: 'AHORA',   color: '#D4920E', bg: '#FEF3D0', emoji: '⭐' },
-  next:  { label: 'DESPUÉS', color: '#1D9E75', bg: '#E1F5EE', emoji: '🔜' },
-  later: { label: 'LUEGO',   color: '#7B7A73', bg: '#F1EFE8', emoji: '⏳' },
+  now:   { label: 'AHORA',   color: '#D4920E', bg: '#FEF3D0' },
+  next:  { label: 'DESPUÉS', color: '#1D9E75', bg: '#E1F5EE' },
+  later: { label: 'LUEGO',   color: '#7B7A73', bg: '#F1EFE8' },
 };
 
 export default function Anticipation({ childId, onProgress }) {
@@ -22,7 +22,7 @@ export default function Anticipation({ childId, onProgress }) {
   async function handleAdvance() {
     try {
       const updated = await api.patch(`/schedule/${childId}/advance`);
-      setSchedule(updated);
+      setSchedule(prev => ({ ...prev, ...updated }));
       if (updated?.progress) onProgress?.(updated.progress);
     } catch (e) {
       alert('Error: ' + e.message);
@@ -32,11 +32,10 @@ export default function Anticipation({ childId, onProgress }) {
   const nowSlot = schedule?.slot_now;
   const allDone = nowSlot?.completed && !schedule?.slot_next && !schedule?.slot_later;
 
-  if (loading) return <div style={s.center}><span style={s.spinner}>⏳</span></div>;
+  if (loading) return <div style={s.center}><p style={s.emptyHint}>Cargando…</p></div>;
 
   if (!schedule) return (
     <div style={s.center}>
-      <span style={{ fontSize: '64px' }}>📅</span>
       <p style={s.emptyMsg}>No hay agenda para hoy</p>
       <p style={s.emptyHint}>Pídele a mamá o papá que la configure</p>
     </div>
@@ -44,9 +43,8 @@ export default function Anticipation({ childId, onProgress }) {
 
   if (allDone) return (
     <div style={s.center}>
-      <span style={{ fontSize: '80px' }}>🎉</span>
       <p style={s.emptyMsg}>¡Todo hecho por hoy!</p>
-      <p style={s.emptyHint}>¡Buen trabajo! Has completado todas las actividades</p>
+      <p style={s.emptyHint}>Buen trabajo, has completado todas las actividades</p>
     </div>
   );
 
@@ -75,15 +73,14 @@ export default function Anticipation({ childId, onProgress }) {
               }}
             >
               <div style={{ ...s.slotHeader, background: cfg.color }}>
-                <span style={s.slotEmoji}>{cfg.emoji}</span>
                 <span style={s.slotTitle}>{cfg.label}</span>
               </div>
 
               <div style={s.slotBody}>
                 {data.completed ? (
                   <div style={s.checkWrap}>
-                    <span style={s.check}>✅</span>
-                    <span style={s.doneText}>¡Hecho!</span>
+                    <span style={s.check}>✓</span>
+                    <span style={s.doneText}>Hecho</span>
                   </div>
                 ) : (
                   <>
@@ -102,10 +99,9 @@ export default function Anticipation({ childId, onProgress }) {
         })}
       </div>
 
-      {/* Advance button — only if current slot is NOT completed */}
       {nowSlot && !nowSlot.completed && (
         <button style={s.advanceBtn} onClick={handleAdvance}>
-          ✅ Completar "{nowSlot.label}"
+          Completar "{nowSlot.label}"
         </button>
       )}
     </div>
@@ -135,7 +131,6 @@ const s = {
     display: 'flex', alignItems: 'center', gap: '10px',
     padding: '10px 20px',
   },
-  slotEmoji: { fontSize: '22px' },
   slotTitle: { fontSize: '16px', fontWeight: 900, color: '#fff', letterSpacing: '1px' },
   slotBody: {
     display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -144,7 +139,7 @@ const s = {
   pictoImg: { width: '110px', height: '110px', objectFit: 'contain' },
   pictoLabel: { fontSize: '22px', fontWeight: 800 },
   checkWrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' },
-  check: { fontSize: '56px', animation: 'checkmark 0.4s ease both' },
+  check: { fontSize: '48px', fontWeight: 900, color: '#1D9E75' },
   doneText: { fontSize: '20px', fontWeight: 800, color: '#1D9E75' },
   advanceBtn: {
     padding: '16px 28px', borderRadius: '20px',
@@ -159,7 +154,6 @@ const s = {
     alignItems: 'center', justifyContent: 'center',
     gap: '16px', padding: '40px',
   },
-  spinner: { fontSize: '48px', animation: 'pulse 1.5s infinite' },
   emptyMsg: { fontSize: '22px', fontWeight: 800, color: '#1A1916', textAlign: 'center' },
   emptyHint: { fontSize: '16px', color: '#6B6960', textAlign: 'center', fontWeight: 600 },
 };

@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../utils/api.js';
 
 const SLOT_KEYS = ['now', 'next', 'later'];
-const SLOT_LABELS = { now: '⭐ AHORA', next: '🔜 DESPUÉS', later: '⏳ LUEGO' };
+const SLOT_LABELS = { now: 'AHORA', next: 'DESPUÉS', later: 'LUEGO' };
 
-// Only labels — IDs and images resolved at runtime via /api/arasaac/search
 const PRESET_LABELS = [
   'desayunar', 'colegio', 'jugar', 'comer', 'dormir',
   'bañarse', 'terapia', 'pasear', 'leer',
@@ -17,7 +16,6 @@ export default function ScheduleEditor({ childId }) {
   const [pictos, setPictos] = useState([]);
   const [loadingPictos, setLoadingPictos] = useState(true);
 
-  // Resolve all preset labels via ARASAAC API on mount
   useEffect(() => {
     let cancelled = false;
     async function resolve() {
@@ -69,7 +67,7 @@ export default function ScheduleEditor({ childId }) {
 
   return (
     <div style={s.wrap}>
-      <h2 style={s.title}>📅 Configurar agenda de hoy</h2>
+      <h2 style={s.title}>Configurar agenda de hoy</h2>
       <p style={s.sub}>Toca cada bloque para asignar una actividad</p>
 
       <div style={s.slots}>
@@ -95,7 +93,7 @@ export default function ScheduleEditor({ childId }) {
       {selectingSlot && (
         <div style={s.picker}>
           <div style={s.pickerHeader}>
-            <h3 style={s.pickerTitle}>Elige una actividad para "{SLOT_LABELS[selectingSlot]}"</h3>
+            <h3 style={s.pickerTitle}>Elige actividad para "{SLOT_LABELS[selectingSlot]}"</h3>
             <button style={s.closeBtn} onClick={() => setSelectingSlot(null)}>✕</button>
           </div>
           {loadingPictos ? (
@@ -115,7 +113,7 @@ export default function ScheduleEditor({ childId }) {
       )}
 
       <button style={{ ...s.saveBtn, ...(saved ? s.saveBtnSaved : {}) }} onClick={handleSave}>
-        {saved ? '✅ Guardado' : '💾 Guardar agenda de hoy'}
+        {saved ? 'Guardado' : 'Guardar agenda de hoy'}
       </button>
     </div>
   );
