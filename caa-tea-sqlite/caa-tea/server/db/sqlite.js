@@ -2,7 +2,7 @@ import initSqlJs from 'sql.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -90,9 +90,9 @@ export async function initDb() {
     db.prepare("INSERT INTO schedules (id,child_id,date,slot_now,slot_next,slot_later) VALUES (?,?,date('now'),?,?,?)")
       .run(
         scheduleId, SEED_CHILD_ID,
-        JSON.stringify({pictoId:2510, label:'Desayunar', imageUrl:'https://static.arasaac.org/pictograms/2510/2510_300.png', completed:false}),
-        JSON.stringify({pictoId:6386, label:'Colegio',   imageUrl:'https://static.arasaac.org/pictograms/6386/6386_300.png', completed:false}),
-        JSON.stringify({pictoId:3196, label:'Jugar',     imageUrl:'https://static.arasaac.org/pictograms/3196/3196_300.png', completed:false})
+        JSON.stringify({pictoId:7012, label:'Desayunar', imageUrl:'https://static.arasaac.org/pictograms/7012/7012_300.png', completed:false}),
+        JSON.stringify({pictoId:2282, label:'Colegio',   imageUrl:'https://static.arasaac.org/pictograms/2282/2282_300.png', completed:false}),
+        JSON.stringify({pictoId:6537, label:'Jugar',     imageUrl:'https://static.arasaac.org/pictograms/6537/6537_300.png', completed:false})
       );
 
     // Fila inicial de progreso para el niño demo
