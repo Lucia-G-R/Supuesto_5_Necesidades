@@ -44,9 +44,14 @@ router.patch('/:childId/advance', requireAuth, (req, res) => {
   ).get(req.params.childId);
   if (!row) return res.status(404).json({ error: 'Sin agenda hoy' });
 
-  const slotNow  = row.slot_now  ? { ...JSON.parse(row.slot_now),  completed: true  } : null;
-  const slotNext = row.slot_next ? { ...JSON.parse(row.slot_next), completed: false } : null;
-  const slotLater= row.slot_later? JSON.parse(row.slot_later) : null;
+  const completedNow = row.slot_now  ? { ...JSON.parse(row.slot_now),  completed: true } : null;
+  const oldNext      = row.slot_next ? JSON.parse(row.slot_next) : null;
+  const oldLater     = row.slot_later? JSON.parse(row.slot_later) : null;
+
+  // Rotate: next becomes now, later becomes next, later becomes null
+  const slotNow   = oldNext  ? { ...oldNext,  completed: false } : completedNow;
+  const slotNext  = oldLater ? { ...oldLater, completed: false } : null;
+  const slotLater = null;
 
   db.prepare(
     "UPDATE schedules SET slot_now=?,slot_next=?,slot_later=?,updated_at=datetime('now') WHERE id=?"
