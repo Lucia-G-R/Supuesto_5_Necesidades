@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"client: %{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(curl -s -X POST http://localhost:3001/api/auth/child-login -H 'Content-Type: application/json' -d '{\"childId\":\"00000000-0000-0000-0000-000000000010\"}')",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const j=JSON.parse\\(d\\);console.log\\(JSON.stringify\\(j.topPictograms,null,2\\)\\)}\\)\")"
+    ]
+  }
+}

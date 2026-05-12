@@ -14,12 +14,12 @@ const CATEGORIES = [
   {
     id: 'acciones', label: 'Acciones', color: '#1D9E75', bg: '#C8F0E1',
     keywords: ['jugar', 'dormir', 'leer', 'dibujar', 'cantar', 'respirar', 'escuchar',
-               'hablar', 'correr', 'saltar', 'caminar', 'escribir', 'colegio', 'ver televisión'],
+               'hablar', 'correr', 'saltar', 'caminar', 'escribir', 'estudiar', 'pasear'],
   },
   {
     id: 'sentir', label: 'Sentir', color: '#D85A30', bg: '#FFEDED',
-    keywords: ['feliz', 'triste', 'enfadado', 'asustado', 'calmado', 'sorprendido',
-               'cansado', 'aburrido', 'hambre', 'sed', 'frío', 'calor', 'dolor', 'me gusta'],
+    keywords: ['feliz', 'triste', 'enfadado', 'asustado', 'tranquilo', 'sorprendido',
+               'cansado', 'aburrido', 'hambre', 'sed', 'frío', 'calor', 'dolor', 'gustar'],
   },
   {
     id: 'lugares', label: 'Lugares', color: '#4A90E2', bg: '#E3F0FF',
@@ -39,7 +39,7 @@ const CATEGORIES = [
   {
     id: 'higiene', label: 'Higiene', color: '#2E7DC4', bg: '#E3F0FF',
     keywords: ['ducha', 'lavarse', 'dientes', 'peine', 'jabón', 'toalla', 'váter',
-               'lavar manos', 'vestirse', 'espejo', 'limpio', 'sucio', 'ordenar', 'limpiar'],
+               'manos', 'vestirse', 'espejo', 'limpio', 'sucio', 'ordenar', 'limpiar'],
   },
   {
     id: 'tiempo', label: 'Tiempo', color: '#5A3FC0', bg: '#EEE8FF',
@@ -54,7 +54,7 @@ const CATEGORIES = [
 ];
 
 const ARASAAC_STATIC = 'https://static.arasaac.org/pictograms';
-const CACHE_KEY = 'caa-pictos-v2';
+const CACHE_KEY = 'caa-pictos-v3';
 
 function pictoUrl(id) { return `${ARASAAC_STATIC}/${id}/${id}_300.png`; }
 
