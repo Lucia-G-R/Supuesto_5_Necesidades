@@ -30,6 +30,7 @@ export default function Anticipation({ childId, onProgress }) {
   }
 
   const currentNowCompleted = schedule?.slot_now?.completed;
+  const allDone = currentNowCompleted && !schedule?.slot_next && !schedule?.slot_later;
 
   if (loading) return <div style={s.center}><span style={s.spinner}>⏳</span></div>;
 
@@ -38,6 +39,14 @@ export default function Anticipation({ childId, onProgress }) {
       <span style={{ fontSize: '64px' }}>📅</span>
       <p style={s.emptyMsg}>No hay agenda para hoy</p>
       <p style={s.emptyHint}>Pídele a mamá o papá que la configure</p>
+    </div>
+  );
+
+  if (allDone) return (
+    <div style={s.center}>
+      <span style={{ fontSize: '80px' }}>🎉</span>
+      <p style={s.emptyMsg}>¡Todo hecho por hoy!</p>
+      <p style={s.emptyHint}>¡Buen trabajo! Has completado todas las actividades</p>
     </div>
   );
 

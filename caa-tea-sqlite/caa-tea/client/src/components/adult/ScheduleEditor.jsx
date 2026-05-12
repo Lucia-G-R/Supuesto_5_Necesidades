@@ -5,15 +5,15 @@ const SLOT_KEYS = ['now', 'next', 'later'];
 const SLOT_LABELS = { now: '⭐ AHORA', next: '🔜 DESPUÉS', later: '⏳ LUEGO' };
 
 const PRESET_PICTOS = [
-  { id: 2510,  label: 'Desayunar',  imageUrl: 'https://static.arasaac.org/pictograms/2510/2510_300.png' },
-  { id: 6386,  label: 'Colegio',    imageUrl: 'https://static.arasaac.org/pictograms/6386/6386_300.png' },
-  { id: 3196,  label: 'Jugar',      imageUrl: 'https://static.arasaac.org/pictograms/3196/3196_300.png' },
-  { id: 38265, label: 'Comer',      imageUrl: 'https://static.arasaac.org/pictograms/38265/38265_300.png' },
-  { id: 5580,  label: 'Dormir',     imageUrl: 'https://static.arasaac.org/pictograms/5580/5580_300.png' },
-  { id: 2948,  label: 'Bañarse',    imageUrl: 'https://static.arasaac.org/pictograms/2948/2948_300.png' },
-  { id: 7957,  label: 'Terapia',    imageUrl: 'https://static.arasaac.org/pictograms/7957/7957_300.png' },
-  { id: 4676,  label: 'Pasear',     imageUrl: 'https://static.arasaac.org/pictograms/4676/4676_300.png' },
-  { id: 29671, label: 'Leer',       imageUrl: 'https://static.arasaac.org/pictograms/29671/29671_300.png' },
+  { id: 7012,  label: 'Desayunar',  imageUrl: 'https://static.arasaac.org/pictograms/7012/7012_300.png' },
+  { id: 2282,  label: 'Colegio',    imageUrl: 'https://static.arasaac.org/pictograms/2282/2282_300.png' },
+  { id: 6537,  label: 'Jugar',      imageUrl: 'https://static.arasaac.org/pictograms/6537/6537_300.png' },
+  { id: 4609,  label: 'Comer',      imageUrl: 'https://static.arasaac.org/pictograms/4609/4609_300.png' },
+  { id: 2489,  label: 'Dormir',     imageUrl: 'https://static.arasaac.org/pictograms/2489/2489_300.png' },
+  { id: 3397,  label: 'Bañarse',    imageUrl: 'https://static.arasaac.org/pictograms/3397/3397_300.png' },
+  { id: 6410,  label: 'Terapia',    imageUrl: 'https://static.arasaac.org/pictograms/6410/6410_300.png' },
+  { id: 6270,  label: 'Pasear',     imageUrl: 'https://static.arasaac.org/pictograms/6270/6270_300.png' },
+  { id: 2485,  label: 'Leer',       imageUrl: 'https://static.arasaac.org/pictograms/2485/2485_300.png' },
 ];
 
 export default function ScheduleEditor({ childId }) {
