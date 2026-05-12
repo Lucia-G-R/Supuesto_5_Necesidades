@@ -29,8 +29,8 @@ export default function Anticipation({ childId, onProgress }) {
     }
   }
 
-  const currentNowCompleted = schedule?.slot_now?.completed;
-  const allDone = currentNowCompleted && !schedule?.slot_next && !schedule?.slot_later;
+  const nowSlot = schedule?.slot_now;
+  const allDone = nowSlot?.completed && !schedule?.slot_next && !schedule?.slot_later;
 
   if (loading) return <div style={s.center}><span style={s.spinner}>⏳</span></div>;
 
@@ -102,10 +102,10 @@ export default function Anticipation({ childId, onProgress }) {
         })}
       </div>
 
-      {/* Advance button - only shown for the adult to tick off */}
-      {!currentNowCompleted && (
+      {/* Advance button — only if current slot is NOT completed */}
+      {nowSlot && !nowSlot.completed && (
         <button style={s.advanceBtn} onClick={handleAdvance}>
-          ✅ Completar "{schedule.slot_now?.label}"
+          ✅ Completar "{nowSlot.label}"
         </button>
       )}
     </div>

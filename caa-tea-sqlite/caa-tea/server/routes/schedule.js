@@ -7,14 +7,24 @@ import { STARS_SCHEDULE_ADVANCE } from '../utils/levels.js';
 
 const router = Router();
 
+// Helper: sql.js may store "null" as text — treat both NULL and "null" as null
+function parseSlot(raw) {
+  if (!raw || raw === 'null') return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function slotToDb(slot) {
+  return slot ? JSON.stringify(slot) : null;
+}
+
 router.get('/:childId/today', requireAuth, (req, res) => {
   const row = db.prepare(
     "SELECT * FROM schedules WHERE child_id=? AND date=date('now')"
   ).get(req.params.childId);
   if (row) {
-    row.slot_now   = row.slot_now   ? JSON.parse(row.slot_now)   : null;
-    row.slot_next  = row.slot_next  ? JSON.parse(row.slot_next)  : null;
-    row.slot_later = row.slot_later ? JSON.parse(row.slot_later) : null;
+    row.slot_now   = parseSlot(row.slot_now);
+    row.slot_next  = parseSlot(row.slot_next);
+    row.slot_later = parseSlot(row.slot_later);
   }
   res.json(row || null);
 });
@@ -28,13 +38,13 @@ router.put('/:childId', requireAuth, requireAdult, (req, res) => {
   if (existing) {
     db.prepare(
       "UPDATE schedules SET slot_now=?,slot_next=?,slot_later=?,updated_at=datetime('now') WHERE id=?"
-    ).run(JSON.stringify(slotNow), JSON.stringify(slotNext), JSON.stringify(slotLater), existing.id);
+    ).run(slotToDb(slotNow), slotToDb(slotNext), slotToDb(slotLater), existing.id);
     return res.json({ id: existing.id });
   }
   const id = randomUUID();
   db.prepare(
     "INSERT INTO schedules (id,child_id,date,slot_now,slot_next,slot_later) VALUES (?,?,date('now'),?,?,?)"
-  ).run(id, req.params.childId, JSON.stringify(slotNow), JSON.stringify(slotNext), JSON.stringify(slotLater));
+  ).run(id, req.params.childId, slotToDb(slotNow), slotToDb(slotNext), slotToDb(slotLater));
   res.json({ id });
 });
 
@@ -44,28 +54,45 @@ router.patch('/:childId/advance', requireAuth, (req, res) => {
   ).get(req.params.childId);
   if (!row) return res.status(404).json({ error: 'Sin agenda hoy' });
 
-  const completedNow = row.slot_now  ? { ...JSON.parse(row.slot_now),  completed: true } : null;
-  const oldNext      = row.slot_next ? JSON.parse(row.slot_next) : null;
-  const oldLater     = row.slot_later? JSON.parse(row.slot_later) : null;
+  const nowSlot   = parseSlot(row.slot_now);
+  const nextSlot  = parseSlot(row.slot_next);
+  const laterSlot = parseSlot(row.slot_later);
 
-  // Rotate: next becomes now, later becomes next, later becomes null
-  const slotNow   = oldNext  ? { ...oldNext,  completed: false } : completedNow;
-  const slotNext  = oldLater ? { ...oldLater, completed: false } : null;
-  const slotLater = null;
+  // If current slot is already completed (shouldn't happen but guard)
+  if (nowSlot?.completed) {
+    return res.json({ slot_now: nowSlot, slot_next: nextSlot, slot_later: laterSlot, progress: null });
+  }
+
+  // Mark current as completed
+  const completedLabel = nowSlot?.label || null;
+
+  // Rotate: next → now, later → next, null at the end
+  let newNow, newNext, newLater;
+  if (nextSlot) {
+    // There are more activities — rotate
+    newNow   = { ...nextSlot, completed: false };
+    newNext  = laterSlot ? { ...laterSlot, completed: false } : null;
+    newLater = null;
+  } else {
+    // This was the last activity — mark it completed, no rotation
+    newNow   = { ...nowSlot, completed: true };
+    newNext  = null;
+    newLater = null;
+  }
 
   db.prepare(
     "UPDATE schedules SET slot_now=?,slot_next=?,slot_later=?,updated_at=datetime('now') WHERE id=?"
-  ).run(JSON.stringify(slotNow), JSON.stringify(slotNext), JSON.stringify(slotLater), row.id);
+  ).run(slotToDb(newNow), slotToDb(newNext), slotToDb(newLater), row.id);
 
   db.prepare('INSERT INTO usage_events (id,user_id,event_type,details) VALUES (?,?,?,?)')
-    .run(randomUUID(), req.params.childId, 'schedule_advanced', JSON.stringify({ slot: slotNow?.label || null }));
+    .run(randomUUID(), req.params.childId, 'schedule_advanced', JSON.stringify({ slot: completedLabel }));
 
   let progress = null;
   if (req.user.role === 'child' && req.user.id === req.params.childId) {
     progress = awardStars(req.user.id, STARS_SCHEDULE_ADVANCE);
   }
 
-  res.json({ slot_now: slotNow, slot_next: slotNext, slot_later: slotLater, progress });
+  res.json({ slot_now: newNow, slot_next: newNext, slot_later: newLater, progress });
 });
 
 export default router;

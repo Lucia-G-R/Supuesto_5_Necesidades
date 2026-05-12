@@ -4,22 +4,41 @@ import { api } from '../../utils/api.js';
 const SLOT_KEYS = ['now', 'next', 'later'];
 const SLOT_LABELS = { now: '⭐ AHORA', next: '🔜 DESPUÉS', later: '⏳ LUEGO' };
 
-const PRESET_PICTOS = [
-  { id: 7012,  label: 'Desayunar',  imageUrl: 'https://static.arasaac.org/pictograms/7012/7012_300.png' },
-  { id: 2282,  label: 'Colegio',    imageUrl: 'https://static.arasaac.org/pictograms/2282/2282_300.png' },
-  { id: 6537,  label: 'Jugar',      imageUrl: 'https://static.arasaac.org/pictograms/6537/6537_300.png' },
-  { id: 4609,  label: 'Comer',      imageUrl: 'https://static.arasaac.org/pictograms/4609/4609_300.png' },
-  { id: 2489,  label: 'Dormir',     imageUrl: 'https://static.arasaac.org/pictograms/2489/2489_300.png' },
-  { id: 3397,  label: 'Bañarse',    imageUrl: 'https://static.arasaac.org/pictograms/3397/3397_300.png' },
-  { id: 6410,  label: 'Terapia',    imageUrl: 'https://static.arasaac.org/pictograms/6410/6410_300.png' },
-  { id: 6270,  label: 'Pasear',     imageUrl: 'https://static.arasaac.org/pictograms/6270/6270_300.png' },
-  { id: 2485,  label: 'Leer',       imageUrl: 'https://static.arasaac.org/pictograms/2485/2485_300.png' },
+// Only labels — IDs and images resolved at runtime via /api/arasaac/search
+const PRESET_LABELS = [
+  'desayunar', 'colegio', 'jugar', 'comer', 'dormir',
+  'bañarse', 'terapia', 'pasear', 'leer',
 ];
 
 export default function ScheduleEditor({ childId }) {
   const [slots, setSlots] = useState({ now: null, next: null, later: null });
   const [saved, setSaved] = useState(false);
   const [selectingSlot, setSelectingSlot] = useState(null);
+  const [pictos, setPictos] = useState([]);
+  const [loadingPictos, setLoadingPictos] = useState(true);
+
+  // Resolve all preset labels via ARASAAC API on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function resolve() {
+      const results = [];
+      for (const label of PRESET_LABELS) {
+        try {
+          const list = await api.get(`/arasaac/search?q=${encodeURIComponent(label)}&lang=es`);
+          if (!cancelled && list?.[0]) {
+            results.push({
+              id: list[0].id,
+              label: label.charAt(0).toUpperCase() + label.slice(1),
+              imageUrl: list[0].imageUrl,
+            });
+          }
+        } catch { /* skip */ }
+      }
+      if (!cancelled) { setPictos(results); setLoadingPictos(false); }
+    }
+    resolve();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     api.get(`/schedule/${childId}/today`)
@@ -73,22 +92,25 @@ export default function ScheduleEditor({ childId }) {
         ))}
       </div>
 
-      {/* Picto picker */}
       {selectingSlot && (
         <div style={s.picker}>
           <div style={s.pickerHeader}>
             <h3 style={s.pickerTitle}>Elige una actividad para "{SLOT_LABELS[selectingSlot]}"</h3>
             <button style={s.closeBtn} onClick={() => setSelectingSlot(null)}>✕</button>
           </div>
-          <div style={s.pickerGrid}>
-            {PRESET_PICTOS.map(picto => (
-              <button key={picto.id} style={s.pickerCard} onClick={() => assignPicto(picto)}>
-                <img src={picto.imageUrl} alt={picto.label} style={s.pictoImg}
-                     onError={e => e.target.style.display='none'} />
-                <span style={s.pickerLabel}>{picto.label}</span>
-              </button>
-            ))}
-          </div>
+          {loadingPictos ? (
+            <p style={{ textAlign: 'center', color: '#6B6960', fontWeight: 600 }}>Cargando pictogramas…</p>
+          ) : (
+            <div style={s.pickerGrid}>
+              {pictos.map(picto => (
+                <button key={picto.id} style={s.pickerCard} onClick={() => assignPicto(picto)}>
+                  <img src={picto.imageUrl} alt={picto.label} style={s.pictoImg}
+                       onError={e => e.target.style.display='none'} />
+                  <span style={s.pickerLabel}>{picto.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
