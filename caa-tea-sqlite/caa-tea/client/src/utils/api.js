@@ -1,7 +1,8 @@
+import { useStore } from '../store.js';
+
 const BASE = '/api';
 
 export async function apiFetch(path, options = {}) {
-  const { useStore } = await import('../store.js');
   const token = useStore.getState().token;
 
   const res = await fetch(`${BASE}${path}`, {

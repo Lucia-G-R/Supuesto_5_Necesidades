@@ -29,12 +29,18 @@ export default function Anticipation({ childId, onProgress }) {
     }
   }
 
-  const nowSlot = schedule?.slot_now;
-  const allDone = nowSlot?.completed && !schedule?.slot_next && !schedule?.slot_later;
+  const slots = [
+    { key: 'now',   data: schedule?.slot_now   },
+    { key: 'next',  data: schedule?.slot_next  },
+    { key: 'later', data: schedule?.slot_later },
+  ];
+  const hasAnySlot   = slots.some(s => s.data);
+  const pendingEntry = slots.find(s => s.data && !s.data.completed);
+  const allDone      = hasAnySlot && !pendingEntry;
 
   if (loading) return <div style={s.center}><p style={s.emptyHint}>Cargando…</p></div>;
 
-  if (!schedule) return (
+  if (!schedule || !hasAnySlot) return (
     <div style={s.center}>
       <p style={s.emptyMsg}>No hay agenda para hoy</p>
       <p style={s.emptyHint}>Pídele a mamá o papá que la configure</p>
@@ -47,12 +53,6 @@ export default function Anticipation({ childId, onProgress }) {
       <p style={s.emptyHint}>Buen trabajo, has completado todas las actividades</p>
     </div>
   );
-
-  const slots = [
-    { key: 'now',   data: schedule.slot_now   },
-    { key: 'next',  data: schedule.slot_next  },
-    { key: 'later', data: schedule.slot_later },
-  ];
 
   return (
     <div style={s.wrap}>
@@ -99,9 +99,9 @@ export default function Anticipation({ childId, onProgress }) {
         })}
       </div>
 
-      {nowSlot && !nowSlot.completed && (
+      {pendingEntry && (
         <button style={s.advanceBtn} onClick={handleAdvance}>
-          Completar "{nowSlot.label}"
+          Completar "{pendingEntry.data.label}"
         </button>
       )}
     </div>

@@ -71,3 +71,28 @@ CREATE TABLE IF NOT EXISTS child_progress (
   streak_days      INTEGER NOT NULL DEFAULT 0,
   updated_at       TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Secciones personalizadas creadas por el adulto para el niño
+CREATE TABLE IF NOT EXISTS custom_categories (
+  id          TEXT PRIMARY KEY,
+  child_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  label       TEXT NOT NULL,
+  color       TEXT NOT NULL DEFAULT '#534AB7',
+  bg          TEXT NOT NULL DEFAULT '#EEE8FF',
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Pictogramas añadidos por el adulto a una sección (built-in por id string,
+-- o personalizada por UUID).
+CREATE TABLE IF NOT EXISTS category_pictograms (
+  id           TEXT PRIMARY KEY,
+  child_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  category_id  TEXT NOT NULL,
+  picto_id     INTEGER NOT NULL,
+  label        TEXT NOT NULL,
+  image_url    TEXT NOT NULL,
+  created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(child_id, category_id, picto_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_catpictos_child_cat ON category_pictograms(child_id, category_id);

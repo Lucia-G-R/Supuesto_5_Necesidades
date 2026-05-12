@@ -175,11 +175,19 @@ router.get('/:childId', requireAuth, requireAdult, (req, res) => {
 });
 
 function weekKey(isoDate) {
-  // 'YYYY-WW' from "YYYY-MM-DD HH:MM:SS"
+  // 'YYYY-WW' replicando strftime('%Y-%W'): semanas que empiezan en lunes,
+  // los días previos al primer lunes del año caen en la semana 00.
   const d = new Date(isoDate.replace(' ', 'T') + 'Z');
-  const onejan = new Date(d.getUTCFullYear(), 0, 1);
-  const w = Math.ceil(((d - onejan) / 86_400_000 + onejan.getUTCDay() + 1) / 7);
-  return `${d.getUTCFullYear()}-${String(w).padStart(2, '0')}`;
+  const year = d.getUTCFullYear();
+  const jan1 = new Date(Date.UTC(year, 0, 1));
+  const jan1Day = jan1.getUTCDay();                 // 0=Dom ... 6=Sáb
+  const jsDay = (jan1Day + 6) % 7;                  // 0=Lun ... 6=Dom
+  const daysToFirstMonday = jsDay === 0 ? 0 : 7 - jsDay;
+  const daysSinceJan1 = Math.floor((d - jan1) / 86_400_000);
+  const week = daysSinceJan1 < daysToFirstMonday
+    ? 0
+    : Math.floor((daysSinceJan1 - daysToFirstMonday) / 7) + 1;
+  return `${year}-${String(week).padStart(2, '0')}`;
 }
 
 export default router;

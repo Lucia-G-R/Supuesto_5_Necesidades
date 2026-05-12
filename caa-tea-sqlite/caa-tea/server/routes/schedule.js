@@ -53,40 +53,41 @@ router.patch('/:childId/advance', requireAuth, (req, res) => {
   ).get(req.params.childId);
   if (!row) return res.status(404).json({ error: 'Sin agenda hoy' });
 
-  const nowSlot   = parseSlot(row.slot_now);
-  const nextSlot  = parseSlot(row.slot_next);
-  const laterSlot = parseSlot(row.slot_later);
+  const slots = {
+    now:   parseSlot(row.slot_now),
+    next:  parseSlot(row.slot_next),
+    later: parseSlot(row.slot_later),
+  };
 
-  if (!nowSlot || nowSlot.completed) {
-    return res.json({ slot_now: nowSlot, slot_next: nextSlot, slot_later: laterSlot, progress: null });
+  // Marca el siguiente bloque pendiente como completado SIN reordenar los huecos.
+  // Así el niño ve cada tarea con su ✓ en su slot (AHORA / DESPUÉS / LUEGO)
+  // y el botón pasa al siguiente automáticamente.
+  let completedKey = null;
+  let completedLabel = null;
+  for (const key of ['now', 'next', 'later']) {
+    if (slots[key] && !slots[key].completed) {
+      completedLabel = slots[key].label || null;
+      slots[key] = { ...slots[key], completed: true };
+      completedKey = key;
+      break;
+    }
   }
 
-  const completedLabel = nowSlot.label || null;
+  if (completedKey) {
+    db.prepare(
+      "UPDATE schedules SET slot_now=?,slot_next=?,slot_later=?,updated_at=datetime('now') WHERE id=?"
+    ).run(slotToDb(slots.now), slotToDb(slots.next), slotToDb(slots.later), row.id);
 
-  let newNow, newNext, newLater;
-  if (nextSlot) {
-    newNow   = { ...nextSlot, completed: false };
-    newNext  = laterSlot ? { ...laterSlot, completed: false } : null;
-    newLater = null;
-  } else {
-    newNow   = { ...nowSlot, completed: true };
-    newNext  = null;
-    newLater = null;
+    db.prepare('INSERT INTO usage_events (id,user_id,event_type,details) VALUES (?,?,?,?)')
+      .run(randomUUID(), req.params.childId, 'schedule_advanced', JSON.stringify({ slot: completedLabel, slot_key: completedKey }));
   }
-
-  db.prepare(
-    "UPDATE schedules SET slot_now=?,slot_next=?,slot_later=?,updated_at=datetime('now') WHERE id=?"
-  ).run(slotToDb(newNow), slotToDb(newNext), slotToDb(newLater), row.id);
-
-  db.prepare('INSERT INTO usage_events (id,user_id,event_type,details) VALUES (?,?,?,?)')
-    .run(randomUUID(), req.params.childId, 'schedule_advanced', JSON.stringify({ slot: completedLabel }));
 
   let progress = null;
-  if (req.user.role === 'child' && req.user.id === req.params.childId) {
+  if (completedKey && req.user.role === 'child' && req.user.id === req.params.childId) {
     progress = awardStars(req.user.id, STARS_SCHEDULE_ADVANCE);
   }
 
-  res.json({ slot_now: newNow, slot_next: newNext, slot_later: newLater, progress });
+  res.json({ slot_now: slots.now, slot_next: slots.next, slot_later: slots.later, progress });
 });
 
 export default router;

@@ -7,6 +7,7 @@ import {
 import { useStore } from '../../store.js';
 import { api } from '../../utils/api.js';
 import ScheduleEditor from './ScheduleEditor.jsx';
+import VocabularyEditor from './VocabularyEditor.jsx';
 
 function pictoUrl(id) { return `https://static.arasaac.org/pictograms/${id}/${id}_300.png`; }
 
@@ -129,8 +130,9 @@ export default function AdultApp() {
 
         <nav style={dash.sideNav}>
           {[
-            { id: 'dashboard', icon: '📊', label: 'Progreso' },
-            { id: 'schedule',  icon: '📅', label: 'Agenda' },
+            { id: 'dashboard',  icon: '📊', label: 'Progreso' },
+            { id: 'schedule',   icon: '📅', label: 'Agenda' },
+            { id: 'vocabulary', icon: '🗂️', label: 'Vocabulario' },
           ].map(item => (
             <button
               key={item.id}
@@ -151,6 +153,8 @@ export default function AdultApp() {
       <main style={dash.main}>
         {activeTab === 'schedule' && childId ? (
           <ScheduleEditor childId={childId} />
+        ) : activeTab === 'vocabulary' && childId ? (
+          <VocabularyEditor childId={childId} />
         ) : (
           <>
             <div style={dash.mainHeader}>
@@ -222,7 +226,7 @@ export default function AdultApp() {
                         <XAxis dataKey={usageKey} tick={{ fontSize: 10 }} />
                         <YAxis tick={{ fontSize: 11 }} />
                         <Tooltip
-                          formatter={(v, n) => n === 'minutes'
+                          formatter={(v, _n, item) => item?.dataKey === 'minutes'
                             ? [`${v} min`, 'Minutos']
                             : [`${v}`, 'Eventos']}
                         />
@@ -301,7 +305,7 @@ export default function AdultApp() {
                         <YAxis tick={{ fontSize: 11 }} unit="%" domain={[0,100]} />
                         <Tooltip
                           formatter={(v, n, item) =>
-                            n === 'socialPct'
+                            item?.dataKey === 'socialPct'
                               ? [`${v}% (${item.payload.social} / ${item.payload.total})`, 'Social']
                               : [v, n]
                           }

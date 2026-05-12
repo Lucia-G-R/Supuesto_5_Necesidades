@@ -1,10 +1,10 @@
-# 🛠️ Guía técnica — App CAA-TEA
+# Guía técnica — App CAA-TEA
 
-Documento dirigido a **desarrolladores del equipo** que vayan a tocar código, levantar el entorno o extender la app. Para una explicación funcional / de producto, ver [`README.md`](./README.md).
+Documento dirigido a **desarrolladores del equipo** que vayan a tocar código, levantar el entorno o extender la app. Para la guía completa de producto e instalación, ver [`README.md`](./README.md). Para la instalación paso a paso en Windows con VS Code, ver [`SETUP.md`](./SETUP.md).
 
 ---
 
-## 📦 Stack técnico
+## Stack técnico
 
 | Capa | Tecnología | Versión |
 |---|---|---|
@@ -15,28 +15,27 @@ Documento dirigido a **desarrolladores del equipo** que vayan a tocar código, l
 | TTS | Web Speech API (nativa del navegador) | — |
 | Backend | Node.js + Express (ESM modules) | ≥18 / 4.19 |
 | Base de datos | SQLite vía `sql.js` (WASM, **sin compilación nativa**) | 1.11 |
-| Auth | JWT + bcrypt para PIN del adulto | 9.0 / 5.1 |
+| Auth | JWT + bcryptjs para PIN del adulto | 9.0 / 3.0 |
 | Pictogramas | API REST de ARASAAC | v1 |
 
-> ⚠️ **Importante**: usamos `sql.js` en lugar de `better-sqlite3` precisamente para que funcione en **Windows sin necesidad de Python ni Visual Studio Build Tools**. Cualquier intento de cambiar a `better-sqlite3` rompe la instalación en máquinas Windows estándar.
+> **Importante**: usamos `sql.js` en lugar de `better-sqlite3` precisamente para que funcione en **Windows sin necesidad de Python ni Visual Studio Build Tools**. Cualquier intento de cambiar a `better-sqlite3` rompe la instalación en máquinas Windows estándar.
 
 ---
 
-## 🗂️ Estructura del repositorio
+## Estructura del repositorio
 
 ```
 caa-tea/
 ├── package.json                # Scripts del workspace (raíz)
-├── README.md                   # Visión de producto
-├── DESARROLLO.md               # ⬅️ Este archivo
-├── SETUP.md                    # Notas extra Windows (legacy)
+├── README.md                   # Guía completa (producto + instalación + arranque)
+├── DESARROLLO.md               # Este archivo
+├── SETUP.md                    # Instalación paso a paso en Windows / VS Code
 ├── caa_tea.db                  # Base SQLite (se crea sola)
 ├── sql/
 │   └── 001_schema_sqlite.sql   # Esquema único de BD
-├── server/                     # ───── BACKEND ─────
+├── server/                     # ── BACKEND ──
 │   ├── index.js                # Bootstrap Express + initDb()
 │   ├── package.json
-│   ├── .env.example
 │   ├── db/
 │   │   └── sqlite.js           # Wrapper sql.js compatible con la API de better-sqlite3
 │   ├── middleware/
@@ -49,11 +48,12 @@ caa-tea/
 │   │   ├── emotion.js          # /api/emotion (POST + suma estrellas)
 │   │   ├── dashboard.js        # /api/dashboard/:childId — 6 métricas
 │   │   ├── arasaac.js          # /api/arasaac/{search,categories} — proxy a ARASAAC
+│   │   ├── categories.js       # /api/categories — vocabulario editable
 │   │   └── progress.js         # /api/progress/{rules, :childId}
 │   └── utils/
 │       ├── levels.js           # Tablas de niveles + reglas de estrellas
 │       └── progress.js         # awardStars(), getProgress(), cálculo de racha
-└── client/                     # ───── FRONTEND ─────
+└── client/                     # ── FRONTEND ──
     ├── package.json
     ├── vite.config.js          # Proxy /api → :3001 + PWA
     ├── index.html
@@ -76,38 +76,36 @@ caa-tea/
             │   └── Achievements.jsx     # Niveles + racha + colección
             └── adult/
                 ├── AdultApp.jsx         # Dashboard con 6 gráficas
-                └── ScheduleEditor.jsx   # Edición de la agenda
+                ├── ScheduleEditor.jsx   # Edición de la agenda
+                └── VocabularyEditor.jsx # Edición de vocabulario por categorías
 ```
 
 ---
 
-## ⚙️ Instalación y arranque
+## Instalación y arranque
 
 ### Requisitos
-- **Node.js** ≥ 18 (probado con 24.14)
+- **Node.js** ≥ 18 (probado con 20.x y 24.x)
 - **npm** ≥ 9
 - Sistema operativo: Windows / macOS / Linux. En Windows **no hace falta** Python ni Visual Studio.
 
 ### Pasos
 
 ```bash
-# 1. Clonar el repo y entrar a caa-tea/
+# 1. Entrar a caa-tea/
 cd caa-tea
 
-# 2. Instalar backend
-cd server
-npm install
-cd ..
+# 2. Opción rápida (recomendada)
+npm run install:all
 
-# 3. Instalar frontend
-cd client
-npm install
-cd ..
+# o, manualmente:
+cd server && npm install && cd ..
+cd client && npm install && cd ..
 ```
 
 ### Variables de entorno (opcional)
 
-`server/.env` (copia de `.env.example`):
+`server/.env`:
 
 ```env
 PORT=3001
@@ -115,7 +113,7 @@ JWT_SECRET=cambia_esto_en_produccion
 CLIENT_URL=http://localhost:5173
 ```
 
-Si no existe `.env`, los valores por defecto son los anteriores.
+Si no existe `.env`, los valores por defecto son los anteriores. El propio `index.js` los aplica vía `process.env.X || 'default'`.
 
 ### Arrancar (dos terminales)
 
@@ -124,7 +122,7 @@ Si no existe `.env`, los valores por defecto son los anteriores.
 cd server
 npm run dev          # nodemon (auto-reload)
 # o:
-node index.js
+npm start            # node plano (producción)
 
 # Terminal 2 — frontend
 cd client
@@ -132,6 +130,14 @@ npm run dev          # vite en :5173
 ```
 
 Abre **http://localhost:5173**.
+
+### Build de producción del cliente
+
+```bash
+cd client
+npm run build        # genera client/dist/
+npm run preview      # sirve el bundle generado
+```
 
 ### Reset completo
 Para volver a estado de fábrica:
@@ -141,7 +147,8 @@ Para volver a estado de fábrica:
 taskkill /F /IM node.exe
 
 # Borra la BD (se recreará con datos demo al volver a arrancar)
-rm caa_tea.db
+del caa_tea.db        # Windows
+# rm caa_tea.db       # macOS / Linux
 
 # (opcional) limpia la caché de pictogramas en el navegador:
 # DevTools → Application → Local Storage → borrar "caa-pictos-v2"
@@ -149,7 +156,7 @@ rm caa_tea.db
 
 ---
 
-## 🗃️ Esquema de base de datos
+## Esquema de base de datos
 
 Definido en `sql/001_schema_sqlite.sql`. Todas las tablas usan `IF NOT EXISTS` así que las migraciones aditivas no rompen nada.
 
@@ -216,7 +223,7 @@ Si rellenas la BD desde otro sitio, asegúrate de mantener este criterio o cambi
 
 ---
 
-## 🔌 API REST completa
+## API REST completa
 
 Todas las rutas que requieren auth llevan `Authorization: Bearer <jwt>` en el header. El JWT lleva `{id, name, role}` y caduca a las 12h (niño) o 4h (adulto).
 
@@ -224,15 +231,15 @@ Todas las rutas que requieren auth llevan `Authorization: Bearer <jwt>` en el he
 
 | Método | Ruta | Body | Auth | Devuelve |
 |---|---|---|---|---|
-| POST | `/api/auth/child-login` | `{childId}` | ❌ | `{token, user}` |
-| POST | `/api/auth/adult-login` | `{userId, pin}` | ❌ | `{token, user}` |
+| POST | `/api/auth/child-login` | `{childId}` | no | `{token, user}` |
+| POST | `/api/auth/adult-login` | `{userId, pin}` | no | `{token, user}` |
 
 ### Users
 
 | Método | Ruta | Auth | Notas |
 |---|---|---|---|
-| GET | `/api/users/all-children` | ❌ | Lista pública para `SelectChild` |
-| GET | `/api/users/all-adults` | ❌ | Lista pública para `PinGate` |
+| GET | `/api/users/all-children` | no | Lista pública para `SelectChild` |
+| GET | `/api/users/all-adults` | no | Lista pública para `PinGate` |
 | GET | `/api/users/children` | adulto | Hijos vinculados al adulto autenticado |
 | POST | `/api/users/event` | sí | `{event_type, details?}` — telemetría libre |
 
@@ -292,7 +299,7 @@ Devuelve un objeto con las 6 series:
 
 | Método | Ruta | Auth | Notas |
 |---|---|---|---|
-| GET | `/api/progress/rules` | ❌ | Tabla de niveles y reglas de estrellas (público para mostrar en Achievements) |
+| GET | `/api/progress/rules` | no | Tabla de niveles y reglas de estrellas (público para mostrar en Achievements) |
 | GET | `/api/progress/:childId` | sí | `{total_stars, level, streak_days, last_active_date, next_threshold}` |
 
 ### ARASAAC (proxy)
@@ -302,9 +309,22 @@ Devuelve un objeto con las 6 series:
 | GET | `/api/arasaac/search?q=<keyword>&lang=es` | Devuelve hasta 30 resultados normalizados `{id, label, imageUrl, category}` |
 | GET | `/api/arasaac/categories?lang=es` | Lista de categorías ARASAAC |
 
+### Categories (vocabulario editable)
+
+| Método | Ruta | Auth | Notas |
+|---|---|---|---|
+| GET | `/api/categories` | no | Categorías + keywords personalizables que alimentan `PhraseBuilder` |
+| PUT | `/api/categories/:id` | adulto | Edita las keywords de una categoría |
+
+### Salud
+
+| Método | Ruta | Notas |
+|---|---|---|
+| GET | `/api/health` | `{ok:true, db:'SQLite'}` |
+
 ---
 
-## 🎮 Sistema de niveles (cómo extenderlo)
+## Sistema de niveles (cómo extenderlo)
 
 Definido en `server/utils/levels.js`:
 
@@ -334,7 +354,7 @@ Para cambiar la curva basta con tocar `LEVEL_THRESHOLDS`. Para añadir una nueva
 
 ---
 
-## 🖼️ Pictogramas: cómo se resuelven
+## Pictogramas: cómo se resuelven
 
 Antes el código tenía ~230 IDs ARASAAC hardcodeados, muchos secuenciales o duplicados, sin garantía de que la imagen coincidiera con la etiqueta. Resultado: pictogramas mal colocados.
 
@@ -352,7 +372,7 @@ Esto **garantiza que la imagen siempre se corresponda con la etiqueta** porque e
 
 ---
 
-## 📊 Telemetría disparada por el frontend
+## Telemetría disparada por el frontend
 
 | Evento | Cuándo se dispara | Sirve para |
 |---|---|---|
@@ -364,13 +384,13 @@ Esto **garantiza que la imagen siempre se corresponda con la etiqueta** porque e
 | `picto_response_ms` | Tiempo entre que se muestra el grid y se elige el primer picto | Gráfica 4 |
 | `picto_removed` | Niño borra un picto recién añadido | Errores |
 | `phrase_cleared` | Niño pulsa la papelera con frase no vacía | Errores |
-| `help_requested` | Niño pulsa el FAB 🤝 Adulto | Métrica auxiliar |
+| `help_requested` | Niño pulsa el FAB de adulto | Métrica auxiliar |
 
 Todos van a la tabla `usage_events` con `event_type` y `details` JSON.
 
 ---
 
-## 🧪 Smoke test manual (desde curl)
+## Smoke test manual (desde curl)
 
 ```bash
 CHILD="00000000-0000-0000-0000-000000000010"
@@ -404,7 +424,7 @@ curl -H "Authorization: Bearer $ATOK" \
 
 ---
 
-## 🚧 Troubleshooting
+## Troubleshooting
 
 ### Error `Cannot find package 'better-sqlite3'`
 Estás en una rama vieja. Hicimos migración a `sql.js`. Borra `node_modules` del server y reinstala:
@@ -437,7 +457,7 @@ UPDATE child_progress SET total_stars=0, level=1, streak_days=0, last_active_dat
 
 ---
 
-## 🔜 Tareas abiertas / siguientes pasos
+## Tareas abiertas / siguientes pasos
 
 - [ ] Pantalla de **alta de niños y adultos** desde el dashboard (hoy se hace insertando en BD).
 - [ ] **Cambio de PIN** desde el panel del adulto.
@@ -449,7 +469,7 @@ UPDATE child_progress SET total_stars=0, level=1, streak_days=0, last_active_dat
 
 ---
 
-## 📄 Licencia y créditos
+## Licencia y créditos
 
 - **ARASAAC**: pictogramas Creative Commons By-NC-SA. Hay que mantener la atribución cuando se distribuya la app.
 - **Web Speech API**: nativa del navegador, sin coste ni servidores.

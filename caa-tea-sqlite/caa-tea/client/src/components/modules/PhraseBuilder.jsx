@@ -67,7 +67,8 @@ function saveCache(c) {
 }
 
 export default function PhraseBuilder({ childId, onProgress, giveReward }) {
-  const [activeCat,    setActiveCat]    = useState(CATEGORIES[0]);
+  void giveReward;
+  const [activeCatId,  setActiveCatId]  = useState(CATEGORIES[0].id);
   const [phrase,       setPhrase]       = useState([]);
   const [search,       setSearch]       = useState('');
   const [searchRes,    setSearchRes]    = useState([]);
@@ -75,13 +76,33 @@ export default function PhraseBuilder({ childId, onProgress, giveReward }) {
   const [playing,      setPlaying]      = useState(false);
   const [resolvedCats, setResolvedCats] = useState(loadCache());
   const [resolving,    setResolving]    = useState(false);
+  const [customCats,   setCustomCats]   = useState([]);   // [{id,label,color,bg}]
+  const [extraPictos,  setExtraPictos]  = useState([]);   // [{id,categoryId,pictoId,label,imageUrl}]
   const searchTimer = useRef(null);
   const gridShownAt = useRef(Date.now());
   const responseSent = useRef(false);
   const { speak, stop } = useTTS();
 
+  // Cargar secciones y pictogramas personalizados que el adulto haya añadido.
+  useEffect(() => {
+    if (!childId) return;
+    api.get(`/categories/${childId}`)
+      .then(data => {
+        setCustomCats(data.customCategories || []);
+        setExtraPictos(data.pictograms || []);
+      })
+      .catch(() => {});
+  }, [childId]);
+
+  const allCategories = [
+    ...CATEGORIES,
+    ...customCats.map(c => ({ id: c.id, label: c.label, color: c.color, bg: c.bg, keywords: [] })),
+  ];
+  const activeCat = allCategories.find(c => c.id === activeCatId) || CATEGORIES[0];
+
   // Resolver una categoría (keyword → {id, l}) si aún no está cacheada.
   const resolveCategory = useCallback(async (cat) => {
+    if (!cat.keywords?.length) return;       // categorías custom no tienen keywords
     if (resolvedCats[cat.id]) return;
     setResolving(true);
     const out = [];
@@ -176,7 +197,22 @@ export default function PhraseBuilder({ childId, onProgress, giveReward }) {
     } catch {}
   }
 
-  const displayPictos = search ? searchRes : (resolvedCats[activeCat.id] || []);
+  // Mezcla: pictogramas resueltos por keyword (built-in) + los que el adulto
+  // añadió manualmente a esta misma sección. En secciones custom solo hay añadidos.
+  const builtinResolved = resolvedCats[activeCat.id] || [];
+  const adultExtras = extraPictos
+    .filter(p => p.categoryId === activeCat.id)
+    .map(p => ({ id: p.pictoId, l: p.label, category: activeCat.id }));
+  // Evita duplicados por pictoId.
+  const seen = new Set();
+  const merged = [];
+  for (const p of [...builtinResolved, ...adultExtras]) {
+    const key = `${p.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(p);
+  }
+  const displayPictos = search ? searchRes : merged;
   const accentColor   = search ? '#534AB7' : activeCat.color;
   const showLoading   = !search && resolving && !displayPictos.length;
 
@@ -240,7 +276,7 @@ export default function PhraseBuilder({ childId, onProgress, giveReward }) {
       {!search && (
         <div style={s.catWrap}>
           <div style={s.catStrip}>
-            {CATEGORIES.map(cat => (
+            {allCategories.map(cat => (
               <button
                 key={cat.id}
                 style={{
@@ -249,7 +285,7 @@ export default function PhraseBuilder({ childId, onProgress, giveReward }) {
                   border: `2px solid ${activeCat.id === cat.id ? cat.color : '#E0DDD5'}`,
                   color: activeCat.id === cat.id ? cat.color : '#6B6960',
                 }}
-                onClick={() => setActiveCat(cat)}
+                onClick={() => setActiveCatId(cat.id)}
               >
                 {cat.label}
               </button>

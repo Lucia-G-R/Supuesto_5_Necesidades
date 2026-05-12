@@ -12,6 +12,7 @@ import emotionRouter   from './routes/emotion.js';
 import dashboardRouter from './routes/dashboard.js';
 import arasaacRouter   from './routes/arasaac.js';
 import progressRouter  from './routes/progress.js';
+import categoriesRouter from './routes/categories.js';
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -27,6 +28,7 @@ app.use('/api/emotion',   emotionRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/arasaac',   arasaacRouter);
 app.use('/api/progress',  progressRouter);
+app.use('/api/categories', categoriesRouter);
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, db: 'SQLite' }));
 
