@@ -1,6 +1,9 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{placeins}
+\usepackage{pdfpages}
+
+
 
 \title{\textbf{Transtorno del Espectro Autista}}
 \author{Integrantes: Victoria García Lovelle\\
@@ -330,7 +333,78 @@ Este programa combina la evaluación clínica tradicional con el uso de tecnolog
 
 En conjunto, bbMiradas pone de manifiesto la importancia de la detección temprana y del uso de herramientas innovadoras para la identificación del TEA, lo que refuerza la relevancia de desarrollar recursos de apoyo accesibles que faciliten la comunicación y la intervención desde edades tempranas.
 
+\section{\textbf{Nuestra propuesta}}
+\subsection{\textbf{Idea detrás del proyecto}}
+El diseño de nuestra aplicación para niños con Trastorno del Espectro Autista (TEA) se ha basado en las recomendaciones propuestas por Moreno et al. en su investigación sobre el desarrollo de aplicaciones inclusivas orientadas al tratamiento del TEA.\\ 
 
+A partir de este estudio, se identificó la importancia de desarrollar herramientas digitales centradas en la comunicación y en el fortalecimiento de habilidades sociales y emocionales mediante el uso de elementos visuales e interfaces accesibles. Los autores destacan que muchos niños con TEA muestran una especial afinación hacia las imágenes y los pictogramas, ya que estos facilitan la representación de ideas y la comprensión de actividades cotidianas. Por ello, nuestra aplicación incorpora una interfaz basada en pictogramas dirigidos al niño, permitiendo una interacción más intuitiva, visual y adaptada a sus necesidades comunicativas.\\
+
+Asimismo, el trabajo de Moreno et al. señala que las aplicaciones inclusivas deben favorecer la interacción entre el niño, las tecnologías y las personas de su entorno, especialmente familiares y educadores. Siguiendo esta idea, nuestro proyecto no solo incluye una sección interactiva para el niño, sino también un apartado de estadísticas orientado a los padres. Esta funcionalidad permite realizar un seguimiento de la actividad del usuario, facilitando la observación de patrones de uso y la evolución de determinadas habilidades.\\
+
+Para la selección y diseño de los pictogramas utilizados en la aplicación, también nos hemos basado en el estudio de Zurita-Díaz et al., en el que se analiza la eficacia de diferentes sistemas pictográficos en niños con TEA y necesidades complejas de comunicación. Los autores concluyen que los pictogramas ARASAAC presentan una mayor iconicidad y facilidad de aprendizaje en comparación con otros sistemas comerciales, favoreciendo una mejor comprensión visual, una adquisición más rápida del vocabulario y una mejora de las habilidades comunicativas y sociales. \\
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{Imagen6.jpg}
+\caption{Pictogramas ARASAAC.}
+\end{figure}
+
+Siguiendo estas conclusiones, en nuestro proyecto se ha priorizado el uso de pictogramas claros, simples y altamente visuales, con una organización estructurada y adaptada al usuario. Además, se ha tenido en cuenta la importancia de la personalización y de la accesibilidad visual, aspectos destacados en la investigación como elementos fundamentales para mejorar la interacción y el aprendizaje en niños con TEA. También se adoptó la idea de emplear apoyos visuales organizados de manera lógica y predecible, reduciendo distracciones y facilitando la asociación entre el pictograma y el concepto representado.\\
+
+Otra de las principales recomendaciones del artículo de Moreno et al. consiste en diseñar aplicaciones fáciles de usar, con interfaces intuitivas, organizadas de manera lógica y utilizando elementos visuales relacionados con el mundo real. En consecuencia, nuestro diseño prioriza la simplicidad visual, el uso de iconografía clara y una navegación accesible para evitar sobrecarga cognitiva y mejorar la experiencia del usuario.\\
+
+Además, la investigación remarca la relevancia de los sistemas alternativos de comunicación y del modelo TEACCH como estrategias eficaces para fomentar la autonomía y la comprensión en niños con TEA. Inspirándonos en estas propuestas, la aplicación busca estructurar la información de forma predecible y organizada, promoviendo rutinas visuales y facilitando la comunicación mediante apoyos gráficos.\\
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{Imagen7.png}
+\caption{Modelo TEACCH.}
+\end{figure}
+
+\newpage
+
+Finalmente, ambos estudios destacan la necesidad de aplicar principios de usabilidad, accesibilidad y adaptación individual en el desarrollo de herramientas inclusivas. Por este motivo, durante el diseño de nuestro proyecto se han tenido en cuenta aspectos como la claridad visual, la facilidad de acceso, la operabilidad y la adaptación a las capacidades cognitivas y comunicativas de los niños con TEA.\\
+
+
+\subsection{Descripción de la aplicación desarrollada}
+
+Como resultado del proyecto se ha desarrollado una aplicación web progresiva (PWA) denominada \textit{CAA-TEA}, orientada a niños y niñas con Trastorno del Espectro Autista (TEA) de nivel 2-3 y edades comprendidas entre los 3 y los 6 años. La aplicación está diseñada como un sistema de Comunicación Aumentativa y Alternativa (CAA), centrado en mejorar la comunicación, la anticipación de rutinas, la regulación emocional y la interacción con el entorno mediante apoyos visuales basados en pictogramas de ARASAAC.\\
+
+La aplicación dispone de dos vistas diferenciadas: una dirigida al niño y otra destinada a los adultos responsables, como familiares, terapeutas o docentes. La vista infantil se ha diseñado con una interfaz accesible, visual e intuitiva, utilizando pictogramas, recompensas visuales y navegación simplificada para facilitar el uso autónomo del sistema.\\
+
+Dentro de la interfaz del niño se incluyen cuatro módulos principales:
+
+\begin{itemize}
+    \item \textbf{Hablar}: constructor de frases mediante pictogramas organizados por categorías temáticas, permitiendo generar mensajes que posteriormente son reproducidos mediante síntesis de voz.
+    
+    \item \textbf{Mi día}: agenda visual basada en anticipación de rutinas, estructurada en las secciones ``Ahora'', ``Después'' y ``Luego'', facilitando la comprensión temporal de las actividades.
+    
+    \item \textbf{Sentir}: módulo orientado a la identificación emocional y a la propuesta de estrategias de regulación emocional adaptadas a cada emoción.
+    
+    \item \textbf{Logros}: sistema de gamificación basado en estrellas, niveles y recompensas visuales para reforzar la motivación y la autonomía del usuario.
+\end{itemize}
+
+Por otra parte, la aplicación incorpora una vista específica para adultos protegida mediante autenticación PIN. Esta sección permite acceder a un panel de estadísticas y seguimiento donde se representan diferentes métricas relacionadas con el uso de la aplicación, la evolución comunicativa, las interacciones sociales, el uso de pictogramas y la autonomía emocional del menor. Además, el adulto puede modificar la agenda visual y personalizar parte del vocabulario utilizado en la aplicación.\\
+
+A nivel técnico, el proyecto ha sido desarrollado utilizando tecnologías web modernas como React, Node.js, Express y SQLite, implementándose además como Progressive Web App (PWA) para permitir su instalación en tablets y mejorar la accesibilidad del sistema. Asimismo, la aplicación utiliza la API de ARASAAC para la obtención dinámica de pictogramas y la Web Speech API para la síntesis de voz.\\
+
+Con el objetivo de documentar adecuadamente tanto el funcionamiento como la arquitectura técnica de la aplicación, se incluyen en los anexos del presente trabajo varios documentos complementarios:
+
+\begin{itemize}
+    \item \textbf{Anexo A -- README}: documento orientado al uso general de la aplicación, donde se describe el funcionamiento del sistema, instalación, configuración, estructura general, módulos disponibles y guía de utilización.
+    
+    \item \textbf{Anexo B -- DESARROLLO}: documento técnico dirigido al desarrollo y mantenimiento del proyecto, incluyendo la arquitectura software, estructura del repositorio, diseño de la API REST, base de datos, telemetría, sistema de niveles y decisiones de implementación.
+    
+    \item \textbf{Anexo C -- SETUP}: guía de instalación y configuración del entorno de desarrollo, especialmente orientada a la puesta en marcha del proyecto en Windows y Visual Studio Code.
+\end{itemize}
+
+Estos anexos permiten ampliar la información técnica y funcional del proyecto sin sobrecargar el contenido principal de la memoria.
+
+
+
+Estos anexos permiten ampliar la información técnica y funcional del proyecto sin sobrecargar el contenido principal de la memoria.
+
+\newpage
 \section{\textbf{Conclusión}}
 El Trastorno del Espectro del Autismo (TEA) constituye una condición compleja del neurodesarrollo caracterizada por una gran heterogeneidad en su manifestación, lo que exige una comprensión amplia, actualizada y centrada en la persona. A lo largo de este trabajo se ha puesto de manifiesto la importancia de abordar el TEA desde un enfoque integral que contemple no solo sus características clínicas, sino también los factores etiológicos, los procesos de detección temprana y las estrategias de intervención más eficaces.\\
 
@@ -339,6 +413,7 @@ En este sentido, la evidencia científica destaca el valor fundamental de la det
 Por otro lado, el análisis del marco normativo y de la situación actual en España pone de relieve avances significativos en el reconocimiento de derechos, pero también importantes desafíos, especialmente en relación con la equidad en el acceso a los servicios, la coordinación entre sistemas y la continuidad de los apoyos a lo largo del ciclo vital.\\
 
 En definitiva, avanzar en el conocimiento y la intervención en el TEA implica no solo mejorar los recursos y prácticas profesionales, sino también promover una sociedad más inclusiva, que respete la diversidad, elimine barreras y garantice la igualdad de oportunidades para todas las personas.\\
+
 
 
 \newpage
@@ -359,6 +434,16 @@ G. Moreno, F. Moreira, C. A. Collazos \& H. M. Fardoun, "Recommendations for the
 
 \bibitem{analisis_normativo}
 Análisis normativo. La atención temprana que reciben los niños y las niñas con trastorno del espectro del autismo en España – SID. (s. f.). \url{https://sid-inico.usal.es/documentacion/analisis-normativo-la-atencion-temprana-que-reciben-los-ninos-y-las-ninas-con-trastorno-del-espectro-del-autismo-en-espana/}
+
+\bibitem{moreno2020}
+G. Moreno, F. Moreira, C. A. Collazos y H. M. Fardoun,
+``Recommendations for the design of inclusive apps for the treatment of autism: An approach to design focused on inclusive users,''
+en \textit{2020 15th Iberian Conference on Information Systems and Technologies (CISTI)}, Sevilla, España, 2020.
+
+\bibitem{zurita2026}
+A. J. Zurita-Díaz, A. P. C. Figueira y M. Calleja-Reina,
+``Comparison of the effectiveness of ARASAAC pictograms and commercially available pictograms in children with autism spectrum disorder and complex communication needs,''
+\textit{Revista de Investigación en Logopedia}, vol. 16, no. 1, e101612, 2026.
 
 \end{thebibliography}
 
@@ -406,6 +491,36 @@ Biblioteca | Universidad de Burgos. (s. f.). \url{https://www.ubu.es/biblioteca}
 Confederación Autismo España. (2023, 14 abril). \textit{¿Conoces las señales tempranas del autismo? | Detección temprana del TEA} [Vídeo]. YouTube. \url{https://www.youtube.com/watch?v=Z_Ov-M3J3Gk}
 
 \end{thebibliography}
+
+
+\appendix
+
+\section{README de la aplicación}
+\label{anexo:readme}
+
+La documentación completa de uso, instalación y funcionamiento de la aplicación se adjunta a continuación.
+
+\includepdf[pages=-]{README.pdf}
+
+\newpage
+
+\section{Documentación técnica de desarrollo}
+\label{anexo:desarrollo}
+
+La documentación técnica del proyecto y los detalles de implementación se adjuntan a continuación.
+
+\includepdf[pages=-]{DESARROLLO.pdf}
+
+\newpage
+
+\section{Guía de instalación y configuración}
+\label{anexo:setup}
+
+La guía de instalación y configuración del entorno de desarrollo se adjunta a continuación.
+
+\includepdf[pages=-]{SETUP.pdf}
+
+
 
 \end{document}
 
