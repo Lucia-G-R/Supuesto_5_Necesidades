@@ -61,5 +61,21 @@ k.keyword*
 set(*
 4)
 
-# ───── Claude / herramientas locales ─────
+# ───── herramientas locales ─────
 .claude/settings.local.json
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.toc
+*.lof
+*.lot
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+*.nav
+*.snm
+*.vrb
